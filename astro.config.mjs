@@ -79,6 +79,10 @@ export default defineConfig({
           label: 'Troubleshooting',
           items: [{ label: 'Overview', slug: 'troubleshooting' }],
         },
+        {
+          label: 'Contributing',
+          items: [{ label: 'How to contribute', slug: 'contributing' }],
+        },
       ],
       head: [
         {

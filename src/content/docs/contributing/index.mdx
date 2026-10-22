@@ -1,0 +1,323 @@
+---
+title: How to contribute
+description: A beginner-friendly guide to fixing a page, adding a tutorial, and opening a pull request for the Elephantronics Wiki.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+You do not need to be an electronics expert to help. Fixing a typo, correcting a
+pin number, adding a photo of a working build, or writing a tutorial all make the
+wiki more useful.
+
+There are two paths: a quick edit in the browser for small fixes, and a local
+setup for anything larger. Both end in the same place — a pull request against
+`main`.
+
+## Two ways to contribute
+
+| Change | Best path |
+| --- | --- |
+| Typo, broken link, one incorrect sentence | [Edit on GitHub](#quick-fix-edit-in-the-browser) |
+| New article, wiring table, code sample, screenshots | [Fork and work locally](#full-setup-work-on-your-own-machine) |
+| Reporting a problem without fixing it | [Open an issue](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/issues) |
+
+## Quick fix: edit in the browser
+
+<Steps>
+1. Open the page you want to change on the wiki.
+2. Click **Edit page** at the bottom of the page. GitHub opens the source file.
+3. If you do not have write access, GitHub offers to fork the repository for you.
+4. Make the change in the browser editor.
+5. Choose **Create a new branch and start a pull request**, give it a short title, and submit.
+</Steps>
+
+That is a real pull request, reviewed the same way as a local one. You do not need
+to install anything for a small correction.
+
+## Full setup: work on your own machine
+
+### 1. Fork the repository
+
+Open
+[github.com/MyLifeMyRulesMyCar/elephantronics-wiki](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki)
+and click **Fork**. Keep the default branch name, `main`. The fork is now your
+own copy, and you can push branches to it without asking for write access.
+
+### 2. Install the tools
+
+You need:
+
+- **Git** — check with `git --version`.
+- **Node.js 22.23.4 or newer** — check with `node --version`. Node 24 LTS is a
+  good choice.
+- **npm** — installed with Node.
+- A text editor. VS Code is a common choice, but any editor works.
+
+On Windows, use Git Bash or PowerShell. The commands below work in either.
+
+### 3. Clone your fork and track the original
+
+Replace `your-username` with your GitHub username:
+
+```bash
+git clone https://github.com/your-username/elephantronics-wiki.git
+cd elephantronics-wiki
+
+git remote add upstream https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki.git
+git remote -v
+```
+
+`origin` should point to **your fork**. `upstream` should point to the
+Elephantronics repository.
+
+### 4. Install dependencies
+
+```bash
+npm install
+```
+
+The first install can take several minutes while npm resolves the dependency
+tree. Let it finish; cancelling halfway leaves an incomplete `node_modules`
+folder. Dependencies are not committed — `node_modules/` is ignored.
+
+### 5. Create a branch
+
+```bash
+git switch -c docs/your-change
+```
+
+Use a short, descriptive branch name such as `docs/fix-dht22-wiring` or
+`content/esp32-blink`. If your Git is older and `git switch` is unavailable, use
+`git checkout -b docs/your-change`.
+
+If your fork already existed and may be out of date, sync it before branching:
+
+```bash
+git fetch upstream
+git switch main
+git merge --ff-only upstream/main
+git push origin main
+git switch -c docs/your-change
+```
+
+### 6. Start the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:4321](http://localhost:4321). The page reloads as you edit. Stop the server with
+`Ctrl+C`.
+
+:::note[Local preview is not deployment]
+You are running the site on your own machine, not publishing it. The live site is
+deployed automatically only after a maintainer merges your pull request into
+`main`. Contributors never need deployment credentials.
+:::
+
+## Where to make changes
+
+All published content lives under `src/content/docs/`. Folders become URL
+segments, and an `index.md` file becomes the landing page for its folder.
+
+| What you want to change | Where it lives |
+| --- | --- |
+| A tutorial or article | `src/content/docs/<section>/<page>.md` or `.mdx` |
+| A section landing page | `src/content/docs/<section>/index.md` |
+| Sidebar order and labels | `sidebar` in `astro.config.mjs` |
+| Shared tutorial components | `src/components/` |
+| Brand colours and typography | `src/styles/custom.css` |
+| Site title, navigation, domain | `astro.config.mjs` |
+
+### Add or edit a page
+
+1. Create the file, or open the existing one.
+2. Add frontmatter at the top:
+
+   ```yaml
+   ---
+   title: Your page title
+   description: One sentence used in search results and social previews.
+   ---
+   ```
+
+   Both fields are required. The build fails without a `description`.
+
+3. Write the page. Use `.md` for ordinary articles and `.mdx` only when you need
+   to import a component.
+4. Add the page to the sidebar in `astro.config.mjs`:
+
+   ```js
+   { label: 'Your page title', slug: 'section/your-page' }
+   ```
+
+   The slug is the file path under `src/content/docs/` without the extension.
+   For an `index.md` landing page, use the folder name, for example
+   `slug: 'section'`.
+
+5. Run the checks described below.
+
+Pages do not appear in the sidebar automatically. If your page builds but is
+missing from navigation, the sidebar entry is the usual cause.
+
+### Use the existing components
+
+The tutorial example is
+[`dht22-arduino-uno-oled.mdx`](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/blob/main/src/content/docs/microcontrollers/dht22-arduino-uno-oled.mdx).
+It demonstrates all four shared components:
+
+- `TutorialHeader` — difficulty, time, prerequisites, and verification status.
+- `ComponentCard` — component name, summary, and optional shop link.
+- `WiringTable` — accessible pin-to-pin connection tables.
+- `Callout` — note, tip, and warning boxes.
+
+From a page two folders deep, import them like this:
+
+```mdx
+import Callout from '../../../components/Callout.astro';
+import TutorialHeader from '../../../components/TutorialHeader.astro';
+```
+
+Prefer Starlight's built-in components (`CardGrid`, `LinkCard`, `Steps`, `Tabs`,
+`Aside`) when they already do the job. Code blocks use Starlight's native
+Expressive Code features; do not add a custom code wrapper.
+
+### Images and screenshots
+
+- Put images under `public/images/` and reference them with a root-relative path:
+  `/images/your-image.png`.
+- Keep files reasonably compressed. Very large screenshots slow the site down.
+- Write useful alt text describing what the image shows.
+- Only upload images you have the right to publish. Do not hotlink images from
+  other sites or copy copyrighted diagrams.
+- Remove personal information from screenshots: Wi-Fi names, passwords, serial
+  numbers, email addresses, and location data.
+
+## Check your work
+
+Run these before opening a pull request:
+
+```bash
+npm run check
+npm run build
+```
+
+`npm run check` runs Astro and TypeScript diagnostics and should report zero
+errors. `npm run build` creates the production site and search index; it should
+finish without warnings from your page.
+
+To inspect the production output, including search:
+
+```bash
+npm run preview
+```
+
+Open [http://localhost:4321](http://localhost:4321) and click through your page, the sidebar, and any
+internal links you added. Search is generated at build time, so it is not
+available in the plain development server.
+
+:::caution[Do not commit build output]
+`node_modules/`, `dist/`, `.astro/`, and environment files are ignored on
+purpose. If they appear in `git status`, do not add them.
+:::
+
+## Open the pull request
+
+If this is your first commit on this machine, Git may ask who you are:
+
+```bash
+git config user.name "Your Name"
+git config user.email "you@example.com"
+```
+
+Then commit and push your branch:
+
+```bash
+git add .
+git commit -m "docs: clarify the DHT22 pull-up note"
+git push -u origin docs/your-change
+```
+
+Use a short commit message with a prefix:
+
+- `docs:` for content and corrections
+- `fix:` for broken links, code, or site behaviour
+- `feat:` for new sections or components
+- `chore:` for tooling and maintenance
+
+GitHub will show a **Compare & pull request** button after the push. Set the base
+repository to `MyLifeMyRulesMyCar/elephantronics-wiki` and the base branch to
+`main`. Your branch is the compare branch.
+
+In the pull request:
+
+- Say **what** changed and **why**.
+- Mention how you checked it. If you built the circuit, say what you measured.
+- Include a screenshot or short recording for visual changes.
+- Link the issue it addresses, if there is one.
+- Fill in the checklist in the pull request template.
+
+The **Check pull request** workflow runs `npm ci`, `npm run check`, and
+`npm run build` on every pull request. If it fails, read the log, fix the issue,
+commit, and push again to the same branch. There is no need to open a new pull
+request.
+
+## Content rules
+
+These rules keep the wiki trustworthy:
+
+- **Be honest about verification.** A tutorial is a draft until the circuit has
+  been built and checked. Do not mark a page reviewed because it was proofread.
+  Use `<TutorialHeader status="draft" />` for new tutorials.
+- **Label example values.** Pin numbers, I2C addresses, resistor values, and
+  serial output are examples unless the page says they are requirements.
+- **Cite sources.** Link to datasheets, vendor pages, or standards. Present
+  vendor specifications as published values unless you measured them yourself.
+- **Do not invent specifications.** If you cannot find a value, say so and leave
+  it out. A missing number is better than a wrong one.
+- **Keep safety in scope.** The wiki covers low-voltage DC. Do not publish mains
+  wiring instructions. Tell readers to disconnect power before rewiring.
+- **Keep pages focused.** One topic per page, with a clear title and description.
+  Avoid empty placeholder pages.
+- **Respect licences.** Do not copy text, images, or diagrams without permission.
+
+## After you open the pull request
+
+A maintainer will review the change. You may be asked to clarify a claim, add a
+source, or adjust the structure. Push additional commits to the same branch and
+reply to the comments.
+
+Once the pull request is merged, the site deploys automatically from `main`.
+Contributors do not run a deployment.
+
+To keep your fork up to date:
+
+```bash
+git fetch upstream
+git switch main
+git merge --ff-only upstream/main
+git push origin main
+```
+
+## Common problems
+
+| Problem | What to try |
+| --- | --- |
+| `npm install` seems stuck | The first install resolves many packages and can take minutes. Check your network and let it finish. |
+| Port 4321 is already in use | Run `npm run dev -- --port 4322` and open the printed URL. |
+| Check fails with a missing `description` | Add a `description` to the page frontmatter. |
+| Page builds but is absent from the sidebar | Add the slug to `sidebar` in `astro.config.mjs`; use the folder name for `index.md`. |
+| MDX cannot find a component | Check the relative path. A page two folders deep needs `../../../components/...`. |
+| Internal links fail after moving a page | Use root-relative links such as `/section/page/`, then run `npm run build` and `npm run preview`. |
+| Commit fails because Git has no identity | Set `git config user.name` and `git config user.email`. |
+| Push goes to the wrong repository | Run `git remote -v`; `origin` must be your fork and `upstream` the main repository. |
+| Line-ending warnings on Windows | `.gitattributes` keeps text files as LF. Do not change those settings. |
+
+## Need help?
+
+Open an
+[issue](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/issues) with
+the page URL, what you expected, and what happened. For a content question,
+include the source or measurement you are working from.
+
+Thanks for improving the wiki.

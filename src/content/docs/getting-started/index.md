@@ -78,3 +78,4 @@ connecting a supply, and do not leave a build powered while you are away from it
   quantities.
 - Build the [DHT22 + Arduino UNO tutorial](/microcontrollers/dht22-arduino-uno-oled/).
 - Use the [circuit design checklist](/circuit-design/) before your next power-up.
+- Want to improve the wiki? Read the [contributor guide](/contributing/).

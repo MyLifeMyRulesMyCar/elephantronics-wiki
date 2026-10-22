@@ -39,20 +39,24 @@ npm run build   # production build into dist/
 ## Structure
 
 ```text
-.github/workflows/deploy.yml   GitHub Pages deployment
+.github/
+  workflows/deploy.yml           GitHub Pages deployment
+  workflows/ci.yml               Pull request checks
+  PULL_REQUEST_TEMPLATE.md
 public/
-  CNAME                        Custom domain for GitHub Pages
-  favicon.svg                  Placeholder favicon
+  CNAME                          Custom domain for GitHub Pages
+  favicon.svg                    Placeholder favicon
 src/
-  assets/logo.svg              Placeholder logo (replace — see assets/README.md)
-  components/                  Reusable Astro components for MDX
-  content/docs/                Markdown and MDX pages
-  content/i18n/                Optional UI string overrides
-  content.config.ts            Starlight content collection schema
-  pages/404.astro              Branded 404 page
-  styles/custom.css            Brand tokens and Starlight overrides
-astro.config.mjs               Site, sidebar, logo, and integration config
-DEPLOYMENT.md                  GitHub Pages and DNS instructions
+  assets/logo.svg                Placeholder logo (replace — see assets/README.md)
+  components/                    Reusable Astro components for MDX
+  content/docs/                  Markdown and MDX pages
+  content/i18n/                  Optional UI string overrides
+  content.config.ts              Starlight content collection schema
+  pages/404.astro                Branded 404 page
+  styles/custom.css              Brand tokens and Starlight overrides
+astro.config.mjs                 Site, sidebar, logo, and integration config
+CONTRIBUTING.md                  Contributor entry point
+DEPLOYMENT.md                    GitHub Pages and DNS instructions
 ```
 
 Content sections:
@@ -70,7 +74,8 @@ src/content/docs/
 │  ├─ index.md                            SBC overview
 │  └─ muse-pro-pi/index.md                Muse Pro Pi introduction
 ├─ robotics/index.md                      Scope and roadmap
-└─ troubleshooting/index.md               First-checks routine
+├─ troubleshooting/index.md               First-checks routine
+└─ contributing/index.mdx                 Contributor guide
 ```
 
 ## Content conventions
@@ -127,6 +132,24 @@ Expressive Code features; there is no custom code component.
 with the official artwork and update `logo.alt` in `astro.config.mjs`. See
 [`src/assets/README.md`](src/assets/README.md) for formats and light/dark
 variants.
+
+## Contributing
+
+Fork the repository, create a branch, and open a pull request against `main`.
+The short checklist is in [CONTRIBUTING.md](CONTRIBUTING.md); the full
+beginner-friendly walkthrough is in
+[`src/content/docs/contributing/index.mdx`](src/content/docs/contributing/index.mdx)
+and is published at `/contributing/` after deployment.
+
+Before opening a pull request:
+
+```bash
+npm run check
+npm run build
+```
+
+Pull requests run the same checks in GitHub Actions. Small fixes can also be made
+directly from the **Edit page** link in the site footer.
 
 ## Deployment
 
