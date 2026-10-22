@@ -1,0 +1,17 @@
+---
+import { Aside } from '@astrojs/starlight/components';
+
+interface Props {
+  variant?: 'note' | 'tip' | 'warning';
+  title?: string;
+}
+
+const { variant = 'note', title } = Astro.props;
+
+// Starlight's Aside uses `caution`; expose a friendlier `warning` alias.
+const type = variant === 'warning' ? 'caution' : variant;
+---
+
+<Aside type={type} title={title}>
+  <slot />
+</Aside>

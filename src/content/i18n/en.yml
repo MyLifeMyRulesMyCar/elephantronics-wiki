@@ -1,0 +1,4 @@
+# Optional UI string overrides for English.
+# Starlight ships English defaults; keeping this collection defined avoids a
+# content-layer warning and gives translators a place to start.
+{}

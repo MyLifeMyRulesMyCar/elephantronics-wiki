@@ -1,0 +1,308 @@
+---
+title: DHT22 temperature and humidity with Arduino UNO and OLED
+description: Read temperature and humidity from a DHT22 sensor and show live values on a 0.96-inch I2C OLED using an Arduino UNO. Example wiring and code to verify on your own hardware.
+---
+
+import { CardGrid, Steps } from '@astrojs/starlight/components';
+import Callout from '../../../components/Callout.astro';
+import ComponentCard from '../../../components/ComponentCard.astro';
+import TutorialHeader from '../../../components/TutorialHeader.astro';
+import WiringTable from '../../../components/WiringTable.astro';
+
+The DHT22 (also sold as the AM2302) is a digital temperature and humidity sensor.
+It sends calibrated readings over a single data line, so the microcontroller does
+not need to measure an analog voltage. This tutorial connects a three-pin DHT22
+module and a 0.96-inch I2C OLED to an Arduino UNO and displays the readings.
+
+<Callout variant="warning" title="This tutorial is a draft">
+  The wiring, code, and output below are adapted from Elephantronics' published
+  DHT22 article. They have **not** been bench-tested for this wiki. Verify the
+  pin order and voltage of your own modules before applying power.
+</Callout>
+
+<TutorialHeader
+  difficulty="Beginner"
+  time="45–60 minutes"
+  status="draft"
+  prerequisites={[
+    'Arduino IDE installed on your computer',
+    'A basic breadboard and jumper wires',
+    'A USB cable that carries data, not just power',
+  ]}
+  note="Values in this page are examples. The DHT22 module pin order, the OLED I2C address, and the board revision all need to be checked against your hardware."
+/>
+
+## What you need
+
+<CardGrid>
+  <ComponentCard
+    name="Arduino UNO"
+    summary="Classic 5 V board. The example uses USB power and the hardware I2C pins."
+    quantity={1}
+    shopUrl="https://elephantronics.lk"
+  />
+  <ComponentCard
+    name="DHT22 module"
+    summary="Three-pin temperature and humidity breakout, as used in the source article. A bare four-pin sensor needs a different pin order and a pull-up resistor."
+    quantity={1}
+    shopUrl="https://elephantronics.lk"
+  />
+  <ComponentCard
+    name="0.96-inch I2C OLED"
+    summary="128 × 64 SSD1306 display. The sketch uses the commonly found address 0x3C."
+    quantity={1}
+    shopUrl="https://elephantronics.lk"
+  />
+  <ComponentCard
+    name="Jumper wires"
+    summary="Male-to-male jumpers for the breadboard. Check that they grip the header pins firmly."
+    quantity="1 set"
+  />
+</CardGrid>
+
+## How the DHT22 communicates
+
+The sensor measures temperature and humidity with two sensing elements and an
+internal controller. When the microcontroller requests a reading, the DHT22
+responds on its DATA line with a 40-bit message: humidity and temperature values
+plus a checksum byte. The Arduino library decodes that message and returns
+floating-point values.
+
+Because the protocol is timing-sensitive, use a library rather than bit-banging
+the data line. The DHT22 family is also relatively slow; the source sketch waits
+about two seconds between readings.
+
+## Wiring
+
+### DHT22 to Arduino UNO
+
+<WiringTable
+  caption="Example wiring — DHT22 module to Arduino UNO"
+  fromLabel="DHT22 module"
+  toLabel="Arduino UNO"
+  rows={[
+    { from: 'VCC', to: '5V' },
+    { from: 'DATA', to: 'D2' },
+    { from: 'GND', to: 'GND' },
+  ]}
+  note="This follows the three-pin module in the source article. Bare four-pin DHT22 sensors use a different pin order and normally need a pull-up resistor between VCC and DATA (commonly 4.7–10 kΩ; confirm with the sensor datasheet)."
+/>
+
+### OLED to Arduino UNO
+
+<WiringTable
+  caption="Example wiring — SSD1306 OLED to Arduino UNO"
+  fromLabel="OLED module"
+  toLabel="Arduino UNO"
+  rows={[
+    { from: 'VCC', to: '5V' },
+    { from: 'GND', to: 'GND' },
+    { from: 'SDA', to: 'A4' },
+    { from: 'SCL', to: 'A5' },
+  ]}
+  note="A4 and A5 are the hardware I2C pins on a classic Arduino UNO R3. Check the pinout for UNO R4 boards, clones, and other board families before assuming the same pins."
+/>
+
+<Callout variant="note" title="OLED address">
+  0x3C is a common address for SSD1306 modules, but not the only one. If the
+  display does not initialise, check the wiring first, then try 0x3D before
+  assuming the module is faulty.
+</Callout>
+
+<Callout variant="warning" title="Power off while wiring">
+  Disconnect USB power before changing any connection. Double-check the supply
+  voltage printed on each module. The UNO uses 5 V logic; if you adapt this
+  circuit to a 3.3 V board, verify that every module is safe at that level.
+</Callout>
+
+## Install the libraries
+
+<Steps>
+1. Open **Sketch → Include Library → Manage Libraries** in the Arduino IDE.
+2. Search for **DHT sensor library**, choose the entry by **Adafruit**, and install it.
+3. Install **Adafruit Unified Sensor** when prompted, or search for it explicitly.
+4. Install **Adafruit GFX Library** and **Adafruit SSD1306**.
+</Steps>
+
+## The sketch
+
+Create a new sketch, paste the code below, and select the correct board and port
+under **Tools**. The sketch is reproduced from the source article with comments
+added to make the example pin map explicit.
+
+```cpp title="dht22_oled.ino"
+#include <Wire.h>
+#include "DHT.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// Example pin map for an Arduino UNO R3:
+// DHT22 DATA -> D2, OLED SDA -> A4, SCL -> A5.
+// Verify the pin order on your modules before powering up.
+#define DHTPIN 2
+#define DHTTYPE DHT22
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+DHT dht(DHTPIN, DHTTYPE);
+
+float Temperature;
+float Humidity;
+float Temp_Fahrenheit;
+
+void setup() {
+  Serial.begin(115200);
+
+  // Start the DHT22
+  dht.begin();
+
+  // Start the OLED. 0x3C is common; some modules use 0x3D.
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED initialization failed!");
+    while (1);
+  }
+
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("DHT22 Sensor");
+  display.println("Initializing...");
+  display.display();
+
+  delay(2000);
+}
+
+void loop() {
+  Humidity = dht.readHumidity();
+  Temperature = dht.readTemperature();
+  Temp_Fahrenheit = dht.readTemperature(true);
+
+  // Check whether the readings are valid
+  if (isnan(Humidity) || isnan(Temperature) || isnan(Temp_Fahrenheit)) {
+    Serial.println("Failed to read from DHT22 sensor!");
+
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setCursor(0, 0);
+    display.println("DHT22 Sensor");
+    display.println();
+    display.println("Sensor Error!");
+    display.display();
+
+    delay(2000);
+    return;
+  }
+
+  // Print readings to the Serial Monitor
+  Serial.print("Humidity: ");
+  Serial.print(Humidity);
+  Serial.print("%  ");
+  Serial.print("Temperature: ");
+  Serial.print(Temperature);
+  Serial.print(" C  ");
+  Serial.print(Temp_Fahrenheit);
+  Serial.println(" F");
+
+  // Update the OLED
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("Temperature:");
+
+  display.setTextSize(2);
+  display.setCursor(0, 12);
+  display.print(Temperature, 1);
+
+  display.setTextSize(1);
+  display.print(" C");
+
+  display.setTextSize(1);
+  display.setCursor(0, 38);
+  display.println("Humidity:");
+
+  display.setTextSize(2);
+  display.setCursor(0, 49);
+  display.print(Humidity, 1);
+
+  display.setTextSize(1);
+  display.print(" %");
+
+  display.display();
+
+  // The DHT22 should not be read continuously
+  delay(2000);
+}
+```
+
+## What the code does
+
+- **Pin and sensor type.** `DHTPIN 2` and `DHTTYPE DHT22` must match the wiring
+  and the sensor you actually have. A DHT11 will not work correctly with the
+  DHT22 type selected.
+- **Display setup.** The `Adafruit_SSD1306` object is given the 128 × 64
+  resolution, the `Wire` I2C bus, and the display address. The `-1` argument
+  tells the library there is no separate reset pin.
+- **Start-up check.** If `display.begin()` returns false, the sketch prints a
+  message and stops. That is deliberate: there is no point continuing without a
+  display.
+- **Error handling.** `isnan()` catches failed reads instead of displaying
+  meaningless numbers.
+- **Slow polling.** The two-second delay keeps the sensor within its comfortable
+  sampling range and makes the display readable.
+
+## Check the output
+
+Open **Tools → Serial Monitor** and set the baud rate to **115200**. The source
+article shows output similar to this:
+
+```text
+Humidity: 62.4%  Temperature: 27.3 C  81.1 F
+Humidity: 62.7%  Temperature: 27.4 C  81.3 F
+Humidity: 63.0%  Temperature: 27.4 C  81.3 F
+```
+
+These numbers are illustrative, not expected values. Your readings depend on the
+room, the sensor, and its calibration.
+
+A successful build should show:
+
+1. "DHT22 Sensor / Initializing..." on the OLED after reset.
+2. Temperature and humidity values updating about every two seconds.
+3. Matching lines in the Serial Monitor.
+4. No repeated "Sensor Error!" message.
+
+## If it does not work
+
+| Symptom | First checks |
+| --- | --- |
+| OLED stays blank | VCC and GND; SDA/SCL not swapped; I2C address 0x3C versus 0x3D |
+| "OLED initialization failed!" | I2C wiring, display address, and that A4/A5 are the correct pins on your board |
+| "Failed to read from DHT22 sensor!" | DATA wire on D2, module power, and the pull-up requirement for a bare sensor |
+| Serial Monitor is empty | Correct port selected, baud rate 115200, and a USB data cable |
+| Values drift or look implausible | Let the sensor settle after power-up and keep it away from heat sources; compare with a known reference |
+
+For a broader routine, see [Troubleshooting](/troubleshooting/).
+
+## Next steps
+
+- Review [Electronics Fundamentals](/electronics-fundamentals/) if the wiring
+  and supply rails are new to you.
+- Use the [circuit design checklist](/circuit-design/) before moving the circuit
+  off the breadboard.
+- Read [Microcontrollers](/microcontrollers/) for the planned ESP32 and RP2040
+  versions of this build.
+
+## Source and verification
+
+This page is adapted from
+[DHT22 Humidity & Temperature Sensor with Arduino UNO and OLED Display](https://elephantronics.lk/dht22-article.html)
+on elephantronics.lk. The wiring tables, sketch, and serial output follow that
+article. Source images are not reproduced here.
+
+The circuit has not been assembled or measured for this wiki. Treat it as a
+reproducible starting point and record what you verify on your own hardware.

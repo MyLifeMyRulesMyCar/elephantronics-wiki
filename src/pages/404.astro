@@ -1,0 +1,32 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+
+<StarlightPage
+  frontmatter={{
+    title: 'Page not found',
+    description: 'The requested page does not exist in the Elephantronics Wiki.',
+    template: 'splash',
+    pagefind: false,
+    hero: {
+      title: '404',
+      tagline:
+        'That page is not in the wiki. Check the URL or use search to find the right tutorial.',
+      actions: [
+        { text: 'Start here', link: '/getting-started/', icon: 'right-arrow' },
+        {
+          text: 'Home',
+          link: '/',
+          icon: 'right-arrow',
+          variant: 'minimal',
+        },
+      ],
+    },
+  }}
+>
+  <p>
+    If you followed a link from another page, the address may have changed. Search
+    is available from the site header, and the sidebar lists every published
+    section.
+  </p>
+</StarlightPage>

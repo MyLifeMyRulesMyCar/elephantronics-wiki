@@ -1,0 +1,123 @@
+---
+interface Row {
+  from: string;
+  to: string;
+  note?: string;
+}
+
+interface Props {
+  caption: string;
+  fromLabel?: string;
+  toLabel?: string;
+  rows: Row[];
+  note?: string;
+}
+
+const {
+  caption,
+  fromLabel = 'From',
+  toLabel = 'To',
+  rows,
+  note,
+} = Astro.props;
+
+const hasNotes = rows.some((row) => Boolean(row.note));
+---
+
+<figure class="wiring">
+  <div class="scroll" role="region" aria-label={caption} tabindex="0">
+    <table>
+      <caption>{caption}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{fromLabel}</th>
+          <th scope="col">{toLabel}</th>
+          {hasNotes && <th scope="col">Notes</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              <th scope="row">{row.from}</th>
+              <td>{row.to}</td>
+              {hasNotes && <td>{row.note ?? '—'}</td>}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  {note && <figcaption>{note}</figcaption>}
+</figure>
+
+<style>
+  .wiring {
+    margin-block: 1.5rem;
+  }
+
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+  }
+
+  .scroll:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+
+  table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: var(--sl-text-sm);
+  }
+
+  caption {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-1);
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  th,
+  td {
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--sl-color-bg);
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    color: var(--sl-color-white);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  figcaption {
+    margin-top: 0.55rem;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+</style>

@@ -1,0 +1,121 @@
+---
+title: "Muse Pro Pi: introduction and first boot"
+description: An introduction to the RISC-V Muse Pro Pi single-board computer, its vendor-published specifications, and the steps and checks for a first boot.
+---
+
+The **Muse Pro Pi** is a single-board computer built around an eight-core 64-bit
+RISC-V processor. It targets AI, robotics, education, and embedded projects, and
+it runs Linux distributions such as Bianbu Desktop and Ubuntu.
+
+The vendor styles the name **MUSE Pi Pro**; this wiki uses "Muse Pro Pi" for
+consistency. It is the same board.
+
+:::note[Specifications are vendor-published]
+The figures on this page are summarised from Elephantronics' published
+introduction to the board. They have not been independently measured, and
+configurations vary by SKU. Confirm the exact variant, included accessories, and
+current specifications with the seller before designing around them.
+:::
+
+## Why RISC-V is different
+
+RISC-V, ARM, and x86 are instruction set architectures (ISAs), not processor
+designs. Two chips can implement the same ISA with very different performance,
+power draw, and peripherals.
+
+| | RISC-V | ARM | x86 |
+| --- | --- | --- | --- |
+| ISA style | RISC, modular and extensible | RISC, optimised for efficiency | CISC, large and backward-compatible |
+| Licensing | Open standard; implementations can be built without ISA licence fees | Proprietary ISA licensed by Arm | Proprietary, controlled primarily by Intel and AMD |
+| Typical strength | Customisation, embedded, education, accelerators | Performance per watt and a mature ecosystem | Desktop, workstation, and server software |
+| Typical use here | Muse Pro Pi and other embedded boards | Phones, tablets, many SBCs | PCs and servers |
+
+The practical takeaway for a buyer is software maturity. RISC-V boards can run
+mainstream Linux, but some packages and proprietary tools may not have RISC-V
+builds yet. Check that the software you need is available for the board before
+committing to it.
+
+## Specifications as published
+
+| Module | Vendor-published specification |
+| --- | --- |
+| Processor | SpacemiT M1, 8-core 64-bit RISC-V, up to 2 TOPS AI compute |
+| Memory | LPDDR4X at 2400 MT/s, 8 GB or 16 GB |
+| Storage | eMMC 5.1, 64 GB or 128 GB; M.2 M-Key 2230 NVMe; microSD with UHS-II |
+| Network | Gigabit Ethernet (1000/100 Mbps auto-negotiation), Wi-Fi 6, Bluetooth 5.2 |
+| USB | 4 × USB 3.0 Type-A, 1 × USB 2.0 Type-C OTG |
+| Display | HDMI 1.4 up to 1080p at 60 Hz; 2-lane MIPI DSI |
+| Expansion | 40-pin GPIO, M.2 M-Key, full-size Mini PCIe, 4-lane MIPI CSI, 2-lane MIPI CSI, 2-lane MIPI DSI |
+| Audio | 3.5 mm audio jack |
+| Debug | UART TTL debug interface; Reset, Power, and Flash buttons |
+| Power | USB Power Delivery, 5 V / 9 V / 12 V at up to 3 A |
+| Form factor | FEMTO-ITX, 85 × 56 mm |
+| Operating systems | Bianbu Desktop, Ubuntu, OpenKylin, Deepin, Fedora (per vendor) |
+
+Capabilities described as "up to 2 TOPS" are peak figures for suitable AI
+workloads. They are not a promise that every model will run at that rate.
+
+## What you need for a first boot
+
+- A USB-PD power supply that supports the board's required voltage and current.
+- An HDMI display and an HDMI cable.
+- A USB keyboard and mouse.
+- A stable surface with airflow. The board is a small computer and will warm up
+  under load.
+
+:::caution[Use the specified power supply]
+The board accepts USB Power Delivery at 5 V, 9 V, or 12 V up to 3 A according to
+the vendor. "Up to" is not a recommendation to use the highest voltage with any
+charger. Use a supply that negotiates the correct profile and can deliver the
+board's peak current without browning out.
+:::
+
+## First boot
+
+1. Connect the HDMI display, keyboard, and mouse before applying power.
+2. Connect the USB-PD supply to the board's power input.
+3. Power on and wait for the setup wizard. It may take longer than a phone or a
+   laptop to reach the desktop.
+4. Configure the region, language, keyboard layout, username, and password.
+5. Let the board restart, then confirm that the desktop appears.
+
+The vendor article describes a unit that boots into the Bianbu setup wizard. If
+your board arrives without an operating system, or with a different image,
+follow the seller's flashing instructions instead. Flashing eMMC or microSD
+media is outside the scope of this page.
+
+:::note[Do not assume Raspberry Pi pin compatibility]
+The Muse Pro Pi has a 40-pin header, but a shared connector shape does not mean
+shared pin functions or voltage. Obtain the vendor pinout for your board revision
+and confirm the GPIO voltage before connecting any circuit. A wrong assumption
+here can damage the board or the attached device.
+:::
+
+## A sensible first session
+
+Once the desktop is up, do a few checks before starting a project:
+
+- Confirm the installed OS version and update it using the vendor's instructions.
+- Check that Ethernet or Wi-Fi works and that the board can reach the internet.
+- Open a terminal and confirm that Python and your preferred toolchain are
+  available.
+- Watch the idle temperature for a few minutes. Add cooling if it climbs steadily.
+- Shut down cleanly with the desktop menu or `sudo shutdown now`, then disconnect
+  power. Do not pull power while the system is writing to storage.
+
+## Where to go next
+
+- [Single Board Computers](/single-board-computers/) for the broader context and
+  planned topics.
+- [Circuit Design](/circuit-design/) before connecting anything to the GPIO
+  header.
+- [Troubleshooting](/troubleshooting/) if the board does not boot or behaves
+  intermittently.
+
+## Source
+
+This page is based on
+[Introduction to MUSE Pi Pro](https://elephantronics.lk/Muse-intro.html) on
+elephantronics.lk. The specification table and first-boot outline follow that
+article. Measurements, thermal behaviour, and software compatibility have not
+been independently verified for this wiki.

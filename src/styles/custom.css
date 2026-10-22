@@ -1,0 +1,181 @@
+/*
+ * Elephantronics Wiki brand layer for Starlight.
+ *
+ * Starlight ships a full theme via CSS custom properties. We override the
+ * palette, then add only a few restrained touches. Custom CSS is unlayered,
+ * so it takes precedence over Starlight's layered defaults.
+ */
+
+:root {
+  /* Brand tokens */
+  --el-orange: #ff6b00;
+  --el-orange-soft: #ffb27a;
+  --el-orange-deep: #a63f00;
+  --el-orange-ink: #7a2f00;
+  --el-navy: #151b2b;
+  --el-navy-950: #0e1320;
+  --el-navy-900: #111827;
+  --el-navy-800: #1b2335;
+  --el-navy-700: #273149;
+  --el-line-dark: #2a354b;
+  --el-gray-050: #f7f8fa;
+  --el-gray-100: #eef0f4;
+  --el-gray-200: #e2e6ed;
+  --el-focus-dark: #ffb27a;
+  --el-focus-light: #a63f00;
+
+  /* Dark theme (Starlight's default root) */
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e8ebf2;
+  --sl-color-gray-2: #c3c9d6;
+  --sl-color-gray-3: #929bb0;
+  --sl-color-gray-4: #5f6a80;
+  --sl-color-gray-5: var(--el-line-dark);
+  --sl-color-gray-6: var(--el-navy-800);
+  --sl-color-black: var(--el-navy);
+
+  --sl-color-bg: var(--el-navy);
+  --sl-color-bg-nav: var(--el-navy-900);
+  --sl-color-bg-sidebar: var(--el-navy-900);
+  --sl-color-bg-inline-code: #222c40;
+  --sl-color-hairline: #232d41;
+  --sl-color-hairline-light: var(--el-line-dark);
+  --sl-color-hairline-shade: var(--el-navy);
+
+  --sl-color-accent-low: #3d1d07;
+  --sl-color-accent: var(--el-orange);
+  --sl-color-accent-high: var(--el-orange-soft);
+  --sl-color-text-accent: var(--el-orange-soft);
+  --sl-color-bg-accent: var(--el-orange);
+  --sl-color-text-invert: var(--el-navy);
+
+  /* Typography: system fonts, no network dependency. */
+  --sl-font-mono:
+    'Cascadia Code', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --sl-content-width: 47rem;
+  --sl-line-height: 1.7;
+}
+
+:root[data-theme='light'] {
+  --sl-color-white: var(--el-navy);
+  --sl-color-gray-1: #1c2434;
+  --sl-color-gray-2: #333c4d;
+  --sl-color-gray-3: #5b6475;
+  --sl-color-gray-4: #8991a1;
+  --sl-color-gray-5: var(--el-gray-200);
+  --sl-color-gray-6: var(--el-gray-100);
+  --sl-color-gray-7: var(--el-gray-050);
+  --sl-color-black: #ffffff;
+
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: var(--el-gray-050);
+  --sl-color-bg-sidebar: #ffffff;
+  --sl-color-bg-inline-code: var(--el-gray-100);
+  --sl-color-hairline: var(--el-gray-200);
+  --sl-color-hairline-light: var(--el-gray-100);
+  --sl-color-hairline-shade: #ffffff;
+
+  --sl-color-accent-low: #fff0e6;
+  --sl-color-accent: #b34700;
+  --sl-color-accent-high: var(--el-orange-ink);
+  --sl-color-text-accent: #b34700;
+  --sl-color-bg-accent: var(--el-orange);
+  --sl-color-text-invert: var(--el-navy);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+::selection {
+  background: rgb(255 107 0 / 0.28);
+}
+
+:focus-visible {
+  outline: 2px solid var(--el-focus-dark);
+  outline-offset: 2px;
+}
+
+:root[data-theme='light'] :focus-visible {
+  outline-color: var(--el-focus-light);
+}
+
+/* Headings: tighter tracking, a technical rule between top-level sections. */
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.sl-markdown-content > h2 {
+  border-top: 1px solid var(--sl-color-hairline);
+  padding-top: 1.6rem;
+  margin-top: 2.75rem;
+}
+
+.sl-markdown-content > h2:first-child {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Splash hero */
+.hero > h1 {
+  letter-spacing: -0.035em;
+}
+
+.hero > h1::before {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 4px;
+  margin-bottom: 1.25rem;
+  border-radius: 999px;
+  background: var(--el-orange);
+}
+
+.hero .tagline {
+  max-width: 46rem;
+  color: var(--sl-color-gray-2);
+}
+
+/* Cards keep Starlight's structure; branding is a border and a small lift. */
+.card {
+  border-radius: 0.6rem;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.card:hover {
+  border-color: var(--sl-color-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Tables in prose */
+.sl-markdown-content table {
+  font-size: var(--sl-text-sm);
+}
+
+.sl-markdown-content th {
+  background: var(--sl-color-gray-6);
+}
+
+/* Code blocks: slightly tighter radius to match the component cards. */
+.expressive-code .frame {
+  border-radius: 0.5rem;
+}

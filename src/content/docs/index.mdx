@@ -1,0 +1,84 @@
+---
+title: Elephantronics Wiki
+description: Practical electronics, embedded Linux, robotics, and edge AI tutorials from Elephantronics.
+template: splash
+tableOfContents: false
+head:
+  - tag: title
+    content: Elephantronics Wiki — Practical electronics, embedded Linux, robotics, and edge AI
+hero:
+  title: Elephantronics Wiki
+  tagline: POWERING YOUR IDEAS. Practical electronics, embedded Linux, robotics, and edge AI — documented one build at a time.
+  actions:
+    - text: Start here
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: DHT22 + Arduino UNO
+      link: /microcontrollers/dht22-arduino-uno-oled/
+      icon: right-arrow
+      variant: minimal
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <LinkCard
+    title="Electronics Fundamentals"
+    href="/electronics-fundamentals/"
+    description="Voltage, current, resistance, and power — the vocabulary behind every circuit."
+  />
+  <LinkCard
+    title="Microcontrollers"
+    href="/microcontrollers/"
+    description="Arduino, ESP32, and RP2040 boards, with wiring and code you can adapt."
+  />
+  <LinkCard
+    title="Circuit Design"
+    href="/circuit-design/"
+    description="Turn a schematic idea into a build you can power up without surprises."
+  />
+  <LinkCard
+    title="Single Board Computers"
+    href="/single-board-computers/"
+    description="Linux boards for embedded work, including the RISC-V Muse Pro Pi."
+  />
+  <LinkCard
+    title="Robotics"
+    href="/robotics/"
+    description="Motors, sensors, control loops, and the power budget that holds them together."
+  />
+  <LinkCard
+    title="Troubleshooting"
+    href="/troubleshooting/"
+    description="A repeatable first-checks routine for circuits that refuse to work."
+  />
+</CardGrid>
+
+## Start with a track
+
+- **New to electronics.** Read [Electronics Fundamentals](/electronics-fundamentals/), then build the [DHT22 + Arduino UNO tutorial](/microcontrollers/dht22-arduino-uno-oled/).
+- **Ready to build.** Go straight to the [DHT22 tutorial](/microcontrollers/dht22-arduino-uno-oled/), then use the [circuit design checklist](/circuit-design/) before powering anything new.
+- **Moving to embedded Linux.** Start with the [Single Board Computers overview](/single-board-computers/) and the [Muse Pro Pi introduction](/single-board-computers/muse-pro-pi/).
+
+## How this wiki works
+
+**Verification status is explicit.** Every tutorial states whether it is a draft or
+has been reviewed. A draft is written from cited sources, but it has not been
+bench-tested for this wiki. Treat its wiring, code, and output as a starting
+point, not a guarantee.
+
+**Example values are labelled.** Pin numbers, addresses, and component values are
+examples unless a page says otherwise. Board revisions and module pinouts differ,
+so check the silkscreen and the datasheet for the part in your hand.
+
+**Sources are cited.** Vendor specifications are presented as published, with a
+link to the source. If a value has not been independently measured, the page says
+so.
+
+:::note[Safety first]
+The wiki focuses on low-voltage DC electronics. Mains wiring, high-current
+batteries, and anything that can injure you are out of scope. Disconnect power
+before changing a circuit, and use a certified supply for anything that connects
+to the wall.
+:::

@@ -1,0 +1,121 @@
+---
+interface Props {
+  name: string;
+  summary: string;
+  quantity?: number | string;
+  partNumber?: string;
+  shopUrl?: string;
+  shopLabel?: string;
+}
+
+const {
+  name,
+  summary,
+  quantity,
+  partNumber,
+  shopUrl,
+  shopLabel = 'Check availability at Elephantronics',
+} = Astro.props;
+---
+
+<article class="component-card">
+  <div class="head">
+    <h3>{name}</h3>
+    {quantity && <span class="quantity">{quantity}&times;</span>}
+  </div>
+
+  <p class="summary">{summary}</p>
+
+  {
+    partNumber && (
+      <p class="part">
+        <span class="label">Part / model</span>
+        <span>{partNumber}</span>
+      </p>
+    )
+  }
+
+  {
+    shopUrl && (
+      <a class="shop" href={shopUrl} rel="noopener noreferrer">
+        {shopLabel}
+        <span aria-hidden="true">↗</span>
+      </a>
+    )
+  }
+</article>
+
+<style>
+  .component-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    height: 100%;
+    padding: 1.1rem 1.15rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+    background: var(--sl-color-bg);
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: var(--sl-text-lg);
+    color: var(--sl-color-white);
+  }
+
+  .quantity {
+    flex: none;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 999px;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+  }
+
+  .summary {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+
+  .part {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    font-size: var(--sl-text-sm);
+  }
+
+  .label {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .shop {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .shop:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .shop span {
+    margin-left: 0.2rem;
+  }
+</style>
