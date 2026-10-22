@@ -39,11 +39,12 @@ board expects.
 ## Muse Pro Pi
 
 The **Muse Pro Pi** is a RISC-V single-board computer aimed at AI, robotics,
-education, and embedded projects. Our introduction covers the published
-specifications, what to prepare for first boot, and the checks to make before
-connecting anything to its 40-pin header.
+education, and embedded projects. Start with the published specifications and
+first-boot checks, then go deeper into performance and computer vision:
 
-[Muse Pro Pi: introduction and first boot →](/single-board-computers/muse-pro-pi/)
+- [Introduction and first boot](/single-board-computers/muse-pro-pi/) — specifications, hardware interfaces, and setup.
+- [Benchmark deep dive](/single-board-computers/muse-pro-pi/benchmark-deep-dive/) — storage, CPU, memory, thermal, and GPU results.
+- [Object detection with YOLOv8](/single-board-computers/muse-pro-pi/object-detection/) — SpacemiT AI SDK, models, and real-world troubleshooting.
 
 ## Planned topics
 

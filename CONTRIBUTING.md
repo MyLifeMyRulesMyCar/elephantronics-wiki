@@ -67,11 +67,27 @@ setup is needed.
 - [ ] Internal links use root-relative paths such as `/section/page/`.
 - [ ] Technical claims are sourced, measured, or clearly marked unverified.
 - [ ] Example pin maps and values are labelled as examples.
-- [ ] Screenshots are included for visual changes.
+- [ ] Screenshots and figures are included for visual changes.
+- [ ] Images are WebP under `public/images/<page-slug>/` with alt text and captions.
+- [ ] Animated demos are optimized WebP, not multi-megabyte GIFs.
 - [ ] No secrets, personal data, `node_modules/`, `dist/`, or `.astro/` are committed.
 
 The **Check pull request** workflow runs the type check and production build on
 every pull request.
+
+## Images and animation
+
+Article media belongs in `public/images/<page-slug>/`:
+
+- **Static images:** WebP, resized to the display width (maximum around 1400px),
+  quality 82–88. Use the `Figure` component with alt text, dimensions, and a
+  caption.
+- **Animations:** animated WebP at 640–960px, lazy-loaded. Do not commit
+  multi-megabyte GIFs; keep the original source file outside the repository.
+- **Screenshots:** remove personal data such as Wi-Fi names, passwords, serial
+  numbers, email addresses, and location data.
+- **Rights:** only upload media you have permission to publish. Do not hotlink
+  images from other sites.
 
 ## Content rules
 
@@ -92,12 +108,13 @@ every pull request.
 | --- | --- |
 | `src/content/docs/` | Markdown and MDX content |
 | `src/components/` | Reusable Astro components |
+| `public/images/` | Article images, one folder per page |
 | `src/styles/custom.css` | Brand tokens and theme overrides |
-| `astro.config.mjs` | Site metadata, sidebar, logo, custom domain |
+| `astro.config.mjs` | Site metadata, sidebar, logo, fonts, custom domain |
 | `.github/workflows/deploy.yml` | Deploys `main` to GitHub Pages |
 | `.github/workflows/ci.yml` | Checks pull requests |
 | `DEPLOYMENT.md` | GitHub Pages and DNS runbook |
-| `src/assets/README.md` | Replacing the placeholder logo |
+| `src/assets/README.md` | Logo and favicon guidance |
 
 ## Deployment
 

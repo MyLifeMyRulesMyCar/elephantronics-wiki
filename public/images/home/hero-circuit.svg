@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" width="520" height="420">
+  <defs>
+    <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="rgba(255,255,255,.075)" stroke-width="1" />
+    </pattern>
+    <linearGradient id="trace" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a3d" />
+      <stop offset="1" stop-color="#e8470a" />
+    </linearGradient>
+  </defs>
+
+  <rect width="520" height="420" fill="url(#grid)" />
+
+  <g fill="none" stroke="url(#trace)" stroke-width="2">
+    <path d="M18 318 H118 V242 H196" />
+    <path d="M502 88 H392 V170 H326" />
+    <path d="M64 78 V158 H148" />
+    <path d="M364 360 V302 H278" />
+    <path d="M196 128 H248 V166" />
+  </g>
+
+  <g fill="#ff8a3d">
+    <circle cx="18" cy="318" r="4" />
+    <circle cx="502" cy="88" r="4" />
+    <circle cx="64" cy="78" r="4" />
+    <circle cx="364" cy="360" r="4" />
+    <circle cx="196" cy="128" r="3" />
+  </g>
+
+  <rect x="196" y="166" width="132" height="112" rx="12" fill="#0d1320" stroke="rgba(255,255,255,.32)" stroke-width="2" />
+  <rect x="216" y="186" width="92" height="72" rx="7" fill="rgba(255,107,0,.08)" stroke="rgba(255,107,0,.7)" stroke-width="1.5" />
+  <text x="262" y="228" fill="#ffb27a" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-size="15" font-weight="700" letter-spacing="2" text-anchor="middle">I/O</text>
+
+  <g stroke="rgba(255,255,255,.4)" stroke-width="2">
+    <path d="M196 190 H180 M196 206 H180 M196 222 H180 M196 238 H180 M196 254 H180" />
+    <path d="M328 190 H344 M328 206 H344 M328 222 H344 M328 238 H344 M328 254 H344" />
+    <path d="M216 166 V150 M240 166 V150 M264 166 V150 M288 166 V150" />
+    <path d="M216 278 V294 M240 278 V294 M264 278 V294 M288 278 V294" />
+  </g>
+
+  <path d="M40 382 H78 V364 H98 V392 H128 V352 H152 V382 H188" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+  <g fill="rgba(255,255,255,.5)" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-size="11" letter-spacing="1.4">
+    <text x="14" y="342">3V3</text>
+    <text x="356" y="82">I2C</text>
+    <text x="42" y="70">GPIO</text>
+    <text x="342" y="382">GND</text>
+    <text x="208" y="142">MCU</text>
+  </g>
+</svg>

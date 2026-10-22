@@ -1,0 +1,305 @@
+---
+title: Muse Pro Pi benchmark deep dive
+description: Storage, CPU, memory, thermal, and GPU benchmark results for the RISC-V Muse Pro Pi, compared with published Raspberry Pi 4 and Raspberry Pi 5 numbers.
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Figure from '../../../../components/Figure.astro';
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/cover.webp"
+  alt="Muse Pro Pi benchmark deep dive cover showing the board, RISC-V terminal output, and performance graphs"
+  caption="Benchmark deep dive cover from Elephantronics."
+  width={1400}
+  height={788}
+  variant="cover"
+  priority
+/>
+
+In computer-architecture lectures we learn about processor architectures,
+instruction sets, CPU cores, cache memory, memory bandwidth, storage interfaces,
+and graphics processors. Those concepts can feel theoretical until we watch them
+affect a real system. A single-board computer (SBC) is a useful sandbox: a
+complete, affordable Linux computer where hardware choices are visible and
+measurable.
+
+This experiment tested the SpacemiT MUSE Pi Pro, a RISC-V single-board computer
+running Bianbu Linux, and compared its results with published benchmarks for the
+Raspberry Pi 4 and Raspberry Pi 5. The goal is not to crown a winner from one
+score, but to understand how the systems behave across CPU, memory, storage, GPU,
+and thermal categories.
+
+<Callout variant="warning" title="About these measurements">
+  The Muse Pro Pi numbers were measured by the source author on their own board.
+  The Raspberry Pi numbers come from published tests. Operating-system images,
+  benchmark builds, and cooling setups differ, so this is an informative
+  comparison, not a perfectly controlled head-to-head. The results have not been
+  independently reproduced for this wiki.
+</Callout>
+
+## Why benchmark a single-board computer?
+
+A benchmark turns an architecture claim into something you can observe. It also
+shows the limits of a single number: a board can win one test and lose another
+because the tests stress different parts of the system.
+
+The comparison here uses the same broad categories on each board, but not
+identical lab conditions. Keep that limitation in mind when reading the tables.
+
+## The benchmarking toolkit
+
+Five common, reproducible tests were used, each targeting a different part of the
+system:
+
+- **Storage:** sequential read and write bandwidth in MB/s.
+- **CPU:** `stress-ng` prime/compute workloads, reported in "bogo ops/s".
+- **Memory:** `tinymembench`, measuring C copy, `memcpy`, and `memset` bandwidth.
+- **Thermals:** `stress-ng` CPU load with temperature monitoring at idle and
+  under load.
+- **GPU:** `glmark2` plus a real-world WebGL Aquarium test in the browser.
+
+Comparisons use published results: Tom's Hardware for Raspberry Pi 5 storage,
+the official Raspberry Pi blog for `stress-ng`, Jeff Geerling's `sbc-reviews`
+records for `tinymembench`, and Pi My Life Up for `glmark2`.
+
+## Storage performance: eMMC vs microSD vs NVMe
+
+Storage affects boot time, package installs, logging, and any workload that moves
+large files. The technologies are not interchangeable: eMMC is flash soldered
+close to the SoC, microSD is removable flash behind the SDIO bus, and NVMe uses
+the PCIe interface.
+
+| Configuration | Sequential read (MB/s) | Sequential write (MB/s) |
+| --- | --- | --- |
+| Muse Pro Pi eMMC (source test) | 218 | 199 |
+| Raspberry Pi 5 microSD (published) | 90.5 | 30.8 |
+| Raspberry Pi 5 NVMe, PCIe Gen 2 (published) | 469 | 383.2 |
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/storage-dd.webp"
+  alt="Terminal output of the dd command showing bytes copied, time taken, and data transfer rate"
+  caption="dd storage measurement on the Muse Pro Pi. Image from Elephantronics."
+  width={1200}
+  height={242}
+/>
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/storage-chart.webp"
+  alt="Bar chart comparing sequential read and write throughput for Muse Pro Pi eMMC, Raspberry Pi 5 microSD, and Raspberry Pi 5 NVMe"
+  caption="Figure 1 — eMMC comfortably beats microSD but cannot match PCIe NVMe."
+  width={781}
+  height={447}
+/>
+
+The headline: the Muse Pro Pi reads about **2.4× faster** and writes about
+**6.5× faster** than a Pi 5 running from a typical microSD card. Writes are the
+real story — microSD cards are notoriously weak at sustained writes, which is why
+a Pi 5 doing heavy logging or compiling feels sluggish on SD. A Pi 5 with an NVMe
+SSD roughly doubles the Muse Pro Pi's throughput because PCIe is a wider pipe
+than the eMMC interface.
+
+What is being compared is the complete storage configuration, not just the
+processors. The NVMe result needs extra hardware and a compatible SSD, while the
+Muse Pro Pi number uses onboard eMMC. Sequential numbers also do not tell the
+whole story: random I/O, small files, and latency can rank differently.
+
+## CPU performance: stress-ng
+
+The CPU executes instructions, runs the operating system, and coordinates the
+system, but its performance is not determined by core count alone. Clock
+frequency, instructions per cycle, cache behaviour, memory latency, and compiler
+optimisation all matter. `stress-ng` reports throughput in "bogo ops/s":
+
+| Board | Single-threaded (bogo ops/s) | Multithreaded (bogo ops/s) |
+| --- | --- | --- |
+| Muse Pro Pi (source test) | 57.95 | 439.38 |
+| Raspberry Pi 4 (published) | 104.78 | 413.12 |
+| Raspberry Pi 5 (published) | 182.68 | 737.21 |
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/stress-ng.webp"
+  alt="stress-ng terminal output on the Muse Pro Pi"
+  caption="stress-ng running on the Muse Pro Pi. Image from Elephantronics."
+  width={1200}
+  height={384}
+/>
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/cpu-chart.webp"
+  alt="Bar chart comparing single-threaded and multithreaded stress-ng results for Muse Pro Pi, Raspberry Pi 4, and Raspberry Pi 5"
+  caption="Figure 2 — The single-threaded gap is large; multithreaded is nearly tied with the Pi 4."
+  width={781}
+  height={447}
+/>
+
+Single-threaded performance is the Muse Pro Pi's weakest number: about 55% of the
+Pi 4 and 32% of the Pi 5 per core. That is where clock speed and microarchitecture
+dominate. Multithreaded, the story changes: 439 bogo ops/s pulls slightly ahead
+of the Pi 4's 413, as the extra cores compensate for weaker per-core performance.
+The Pi 5 remains about 68% ahead.
+
+Several cores do not automatically make a processor faster for every workload. A
+mostly sequential program depends on single-core speed, while compiling, parallel
+image processing, or multiple services can exploit many cores if the application
+exposes enough parallel work. For rigor, the same benchmark version, options,
+duration, and system conditions should be used on every board.
+
+## Memory bandwidth: tinymembench
+
+A fast CPU is useless if it waits on data. Registers hold values being processed,
+caches keep hot data close to the cores, main memory holds active programs, and
+storage keeps files. `tinymembench` measures how fast the CPU can move data
+through that hierarchy.
+
+| tinymembench test | Muse Pro Pi (MB/s) | Raspberry Pi 4 (MB/s) | Raspberry Pi 5 (MB/s) |
+| --- | --- | --- | --- |
+| C copy | 2,691.6 | 2,731.0 | 4,870.3 |
+| Standard memcpy | 2,721.1 | 2,737.5 | 4,805.4 |
+| Standard memset | 7,629.1 | 3,102.7 | 13,676.9 |
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/memory-chart.webp"
+  alt="Bar chart comparing tinymembench copy, memcpy, and memset bandwidth across Muse Pro Pi, Raspberry Pi 4, and Raspberry Pi 5"
+  caption="Figure 3 — Copy bandwidth matches the Pi 4; memset (write-only) is a clear win."
+  width={781}
+  height={447}
+/>
+
+Copy bandwidth tracks the Pi 4 almost exactly at around 2.7 GB/s, because
+streaming reads and writes are limited by the memory subsystem rather than the
+core. The Pi 5's LPDDR4X roughly doubles that. The standout is `memset`: the Muse
+Pro Pi reaches 7.6 GB/s, more than twice the Pi 4's figure, because filling memory
+is a write-only, cache-friendly workload that optimized store instructions can
+accelerate. It is still about half of the Pi 5's 13.7 GB/s.
+
+These are memory-operation throughput measurements, not a direct measurement of
+maximum DRAM bandwidth. Small working sets may be served from cache, and library
+implementations differ.
+
+## Thermals under load
+
+Temperature affects sustained performance, reliability, and cooling needs.
+Processors convert electrical power to heat, and when a chip reaches its thermal
+limit it reduces clock frequency — thermal throttling — to protect itself. The
+Muse Pro Pi was tested with a heatsink and fan attached.
+
+| Measurement | Condition | Result |
+| --- | --- | --- |
+| Idle temperature | No load | ~41 °C |
+| Under CPU stress | `stress-ng --cpu 4 --timeout 60s --metrics-brief` | ~52 °C |
+| Temperature rise | 4 workers, 60 seconds | ~11 °C |
+
+An 11 °C rise under full load is remarkably cool. For context, a Raspberry Pi 5
+under similar load typically sits in the 70–85 °C range without active cooling,
+according to the source article. Cool running means no throttling, quieter
+operation, and longer component life.
+
+This was a short test, not a full thermal characterisation. Results depend on
+ambient temperature, fan speed, and workload duration. A useful follow-up is to
+log temperature and CPU frequency every few seconds over a longer, repeatable
+workload.
+
+## GPU performance: glmark2 and WebGL
+
+The GPU handles 3D scenes, desktop compositing, and some parallel workloads.
+`glmark2` renders a series of OpenGL scenes and combines them into a score.
+
+| Board | glmark2 score | Relative to Muse Pro Pi |
+| --- | --- | --- |
+| Muse Pro Pi (source test) | 502 | Baseline |
+| Raspberry Pi 4 (published) | 778 | 55% higher (~65% of its score) |
+| Raspberry Pi 5 (published) | 2,007 | 300% higher (~25% of its score) |
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/glmark2.webp"
+  alt="Animated screen recording of the glmark2 benchmark running on the Muse Pro Pi"
+  caption="glmark2 running on the Muse Pro Pi. Animated WebP from the source article, optimized for the web."
+  width={960}
+  height={540}
+/>
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/webgl-aquarium.webp"
+  alt="Animated screen recording of the WebGL Aquarium benchmark running on the Muse Pro Pi"
+  caption="WebGL Aquarium on the Muse Pro Pi. Animated WebP from the source article, optimized for the web."
+  width={640}
+  height={360}
+/>
+
+<Figure
+  src="/images/muse-pro-pi/benchmark/gpu-chart.webp"
+  alt="Bar chart comparing glmark2 scores for Muse Pro Pi, Raspberry Pi 4, and Raspberry Pi 5"
+  caption="Figure 4 — GPU performance is the clear weak point."
+  width={719}
+  height={388}
+/>
+
+This is the Muse Pro Pi's weakest area: its score is only about 65% of the Pi 4's
+and 25% of the Pi 5's. A real-world WebGL check told the same story: in the
+classic WebGL Aquarium test, the board rendered 500 fish at a steady 30 FPS, but
+pushing the fish count higher quickly dropped the frame rate.
+
+That does not make the board unsuitable. A graphics benchmark reflects the tested
+rendering path, and the driver matters: a GPU's theoretical capability is only
+useful when the software stack can reach it. For headless servers, robotics
+controllers, or sensor gateways, desktop 3D performance is largely irrelevant.
+For graphics-heavy visualisation, the Pi 5 is the clear reference point.
+
+## What these benchmarks teach us
+
+No single number describes a computer. Each metric maps to an architecture
+concept:
+
+| Metric | Architecture concept | Why it matters |
+| --- | --- | --- |
+| Single-threaded CPU | Core design, IPC, clock frequency | Sequential application performance |
+| Multithreaded CPU | Parallel execution and scheduling | Compiling, multitasking, parallel workloads |
+| Memory throughput | Caches, RAM subsystem, data movement | Image processing, data-intensive apps |
+| Storage throughput | Flash technology and I/O interface | Boot, logging, installs, loading models |
+| GPU score | Graphics architecture and drivers | Desktop rendering, graphics workloads |
+| Temperature | Power, cooling, thermal limits | Sustained performance and stability |
+
+The instruction set also matters: the Muse Pro Pi implements RISC-V, while both
+Raspberry Pis use ARM. An ISA defines the instructions software and processors use
+to communicate, but it does not by itself determine which chip is faster.
+Microarchitecture, core count, clock speed, cache hierarchy, memory interface, and
+software optimisation do most of the work.
+
+## Final verdict
+
+Is the Muse Pro Pi worth it? The answer depends on what you want to learn or
+build. There is no single "fastest" computer, only trade-offs.
+
+**Worth it if** you run headless or server-style workloads — web servers, home
+automation, robotics, embedded builds — or you want a real RISC-V platform for
+learning a growing ISA ecosystem. The onboard eMMC, cool thermals, and solid
+multithreaded throughput make it a dependable always-on board with no extra
+storage purchase needed.
+
+**Look elsewhere if** you need single-core speed, desktop-class graphics, or
+maximum memory bandwidth; the Raspberry Pi 5 leads on all three. Even then, budget
+for an NVMe HAT, because a Pi 5 on microSD will lose the storage race to the Muse
+Pro Pi.
+
+For students, the board is most interesting as a hands-on architecture platform:
+exploring RISC-V, Linux, and the interaction between hardware and software.
+Chasing these numbers connects bus widths, memory hierarchies, ISA differences,
+and thermal design to measurable behaviour.
+
+The best SBC is not the one with the highest benchmark score — it is the one whose
+architecture, software support, interfaces, and cost match the problem you want to
+solve.
+
+## Sources
+
+- [Tom's Hardware — Pimoroni NVMe Base for Raspberry Pi 5 review](https://www.tomshardware.com/raspberry-pi/pimoroni-nvme-base-for-raspberry-pi-5-review)
+- [Raspberry Pi official blog — Benchmarking Raspberry Pi 5](https://www.raspberrypi.com/news/benchmarking-raspberry-pi-5/)
+- [Jeff Geerling's sbc-reviews — tinymembench records](https://github.com/geerlingguy/sbc-reviews/issues/)
+- [Pi My Life Up — Raspberry Pi 5 benchmarks](https://pimylifeup.com/RASPBERRY-PI-5-BENCHMARK/)
+
+## Attribution
+
+This page is adapted from Elephantronics' *MUSE Pi Pro Benchmark Deep Dive*. The
+measurements and published comparison values come from that article and its
+cited sources. The Muse Pro Pi results have not been independently reproduced for
+this wiki; treat the comparison as indicative rather than a controlled lab test.

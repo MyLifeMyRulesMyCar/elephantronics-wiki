@@ -84,8 +84,7 @@ After DNS resolves:
 - `https://wiki.elephantronics.lk/microcontrollers/dht22-arduino-uno-oled/`
   returns the tutorial.
 - The certificate is valid for the custom domain and HTTP redirects to HTTPS.
-- The header logo and favicon load (they are still placeholders until the real
-  artwork is added).
+- The header logo and favicon load (the official mark is used).
 - Internal links do not include a repository path such as
   `/elephantronics-wiki/`.
 

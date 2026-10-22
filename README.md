@@ -45,16 +45,17 @@ npm run build   # production build into dist/
   PULL_REQUEST_TEMPLATE.md
 public/
   CNAME                          Custom domain for GitHub Pages
-  favicon.svg                    Placeholder favicon
+  favicon.png                    Official mark, square favicon
+  images/                        Article images, organised by page
 src/
-  assets/logo.svg                Placeholder logo (replace — see assets/README.md)
+  assets/logo.png                Official Elephantronics mark
   components/                    Reusable Astro components for MDX
   content/docs/                  Markdown and MDX pages
   content/i18n/                  Optional UI string overrides
   content.config.ts              Starlight content collection schema
   pages/404.astro                Branded 404 page
   styles/custom.css              Brand tokens and Starlight overrides
-astro.config.mjs                 Site, sidebar, logo, and integration config
+astro.config.mjs                 Site, sidebar, logo, fonts, and integration config
 CONTRIBUTING.md                  Contributor entry point
 DEPLOYMENT.md                    GitHub Pages and DNS instructions
 ```
@@ -68,11 +69,14 @@ src/content/docs/
 ├─ electronics-fundamentals/index.md      Voltage, current, resistance, power
 ├─ microcontrollers/
 │  ├─ index.md                            Board overview
-│  └─ dht22-arduino-uno-oled.mdx          MDX tutorial / component example
+│  └─ dht22-arduino-uno-oled.mdx          DHT22 + OLED tutorial
 ├─ circuit-design/index.md                Pre-power checklist
 ├─ single-board-computers/
 │  ├─ index.md                            SBC overview
-│  └─ muse-pro-pi/index.md                Muse Pro Pi introduction
+│  └─ muse-pro-pi/
+│     ├─ index.mdx                        Introduction and first boot
+│     ├─ benchmark-deep-dive.mdx          Benchmark results
+│     └─ object-detection.mdx             YOLOv8 object detection
 ├─ robotics/index.md                      Scope and roadmap
 ├─ troubleshooting/index.md               First-checks routine
 └─ contributing/index.mdx                 Contributor guide
@@ -91,6 +95,9 @@ src/content/docs/
   with a link, unless they have been independently measured.
 - **Do not invent specifications.** If a datasheet or measurement is unavailable,
   say so and leave the value out.
+- **Keep media local.** Put article images under
+  `public/images/<article-slug>/`. Use WebP, descriptive alt text, and captions
+  where the image needs context. Do not hotlink external images.
 
 ## Adding a page
 
@@ -100,7 +107,8 @@ src/content/docs/
 3. Add the page to `sidebar` in `astro.config.mjs` using its slug, for example
    `slug: 'microcontrollers/dht22-arduino-uno-oled'` for
    `src/content/docs/microcontrollers/dht22-arduino-uno-oled.mdx`.
-4. Run `npm run check` and `npm run build`.
+4. Add the page to the relevant index page and, if useful, the homepage.
+5. Run `npm run check` and `npm run build`.
 
 ## Components
 
@@ -111,6 +119,7 @@ import TutorialHeader from '../../../components/TutorialHeader.astro';
 import ComponentCard from '../../../components/ComponentCard.astro';
 import WiringTable from '../../../components/WiringTable.astro';
 import Callout from '../../../components/Callout.astro';
+import Figure from '../../../components/Figure.astro';
 ```
 
 Adjust the depth of `../` if the page lives at a different level under
@@ -121,17 +130,38 @@ Adjust the depth of `../` if the page lives at a different level under
 - `ComponentCard` — component name, summary, optional part number, and shop link.
 - `WiringTable` — accessible pin-to-pin connections with a caption and note.
 - `Callout` — `note`, `tip`, or `warning`, wrapped around Starlight's `Aside`.
+- `Figure` — responsive image or animated WebP with alt text, caption, dimensions,
+  and a white card backing for charts.
+- `FeaturedCard` — homepage feature card with cover image, tag, and summary.
 
 Prefer Starlight's built-in components (`CardGrid`, `LinkCard`, `Steps`, `Tabs`,
 `Aside`) when they already do the job. Code blocks use Starlight's native
 Expressive Code features; there is no custom code component.
 
+## Images
+
+Article media lives in `public/images/` with one folder per page:
+
+```text
+public/images/
+├─ dht22-arduino-uno-oled/
+├─ muse-pro-pi/
+│  ├─ benchmark/
+│  └─ object-detection/
+└─ ...
+```
+
+Static images are WebP at quality 82–88, resized to a sensible display width.
+Animated demos are animated WebP, not multi-megabyte GIFs, and are referenced with
+`loading="lazy"`. Keep original source files outside the repository. See
+`CONTRIBUTING.md` for the submission checklist.
+
 ## Logo
 
-`src/assets/logo.svg` and `public/favicon.svg` are **placeholders**. Replace them
-with the official artwork and update `logo.alt` in `astro.config.mjs`. See
-[`src/assets/README.md`](src/assets/README.md) for formats and light/dark
-variants.
+`src/assets/logo.png` and `public/favicon.png` use the official Elephantronics
+elephant-circuit mark recovered from the source article assets. The mark is
+navy/cyan on a white background; do not recolour or redraw it. See
+[`src/assets/README.md`](src/assets/README.md) for replacement and variant notes.
 
 ## Contributing
 

@@ -3,12 +3,24 @@ title: "Muse Pro Pi: introduction and first boot"
 description: An introduction to the RISC-V Muse Pro Pi single-board computer, its vendor-published specifications, and the steps and checks for a first boot.
 ---
 
+import Figure from '../../../../components/Figure.astro';
+
 The **Muse Pro Pi** is a single-board computer built around an eight-core 64-bit
 RISC-V processor. It targets AI, robotics, education, and embedded projects, and
 it runs Linux distributions such as Bianbu Desktop and Ubuntu.
 
 The vendor styles the name **MUSE Pi Pro**; this wiki uses "Muse Pro Pi" for
 consistency. It is the same board.
+
+<Figure
+  src="/images/muse-pro-pi/cover.webp"
+  alt="Muse Pro Pi single-board computer with its GPIO header, USB ports, and Ethernet ports visible"
+  caption="Muse Pro Pi. Image from Elephantronics' published introduction."
+  width={931}
+  height={526}
+  variant="cover"
+  priority
+/>
 
 :::note[Specifications are vendor-published]
 The figures on this page are summarised from Elephantronics' published
@@ -29,6 +41,14 @@ power draw, and peripherals.
 | Licensing | Open standard; implementations can be built without ISA licence fees | Proprietary ISA licensed by Arm | Proprietary, controlled primarily by Intel and AMD |
 | Typical strength | Customisation, embedded, education, accelerators | Performance per watt and a mature ecosystem | Desktop, workstation, and server software |
 | Typical use here | Muse Pro Pi and other embedded boards | Phones, tablets, many SBCs | PCs and servers |
+
+<Figure
+  src="/images/muse-pro-pi/architecture.webp"
+  alt="Infographic comparing the RISC-V, ARM, and x86 instruction set architectures"
+  caption="RISC-V, ARM, and x86 compared. Image from Elephantronics' published introduction."
+  width={930}
+  height={514}
+/>
 
 The practical takeaway for a buyer is software maturity. RISC-V boards can run
 mainstream Linux, but some packages and proprietary tools may not have RISC-V
@@ -55,6 +75,23 @@ committing to it.
 Capabilities described as "up to 2 TOPS" are peak figures for suitable AI
 workloads. They are not a promise that every model will run at that rate.
 
+<Figure
+  src="/images/muse-pro-pi/pi5-comparison.webp"
+  alt="Infographic comparing the Raspberry Pi 5 and Muse Pro Pi specifications"
+  caption="Raspberry Pi 5 and Muse Pro Pi compared. Image from Elephantronics' published introduction."
+  width={927}
+  height={514}
+/>
+
+<Figure
+  src="/images/muse-pro-pi/hardware-interfaces.webp"
+  alt="Muse Pro Pi board diagram labelling its connectors, M.2 slot, GPIO header, and MIPI interfaces"
+  caption="Hardware interfaces on the Muse Pro Pi. Image from Elephantronics' published introduction."
+  width={624}
+  height={883}
+  variant="narrow"
+/>
+
 ## What you need for a first boot
 
 - A USB-PD power supply that supports the board's required voltage and current.
@@ -79,10 +116,26 @@ board's peak current without browning out.
 4. Configure the region, language, keyboard layout, username, and password.
 5. Let the board restart, then confirm that the desktop appears.
 
+<Figure
+  src="/images/muse-pro-pi/setup-wizard.webp"
+  alt="Bianbu Linux setup wizard on the Muse Pro Pi showing region, language, and account options"
+  caption="The first-boot setup wizard described in the vendor article. Image from Elephantronics."
+  width={924}
+  height={514}
+/>
+
 The vendor article describes a unit that boots into the Bianbu setup wizard. If
 your board arrives without an operating system, or with a different image,
 follow the seller's flashing instructions instead. Flashing eMMC or microSD
 media is outside the scope of this page.
+
+<Figure
+  src="/images/muse-pro-pi/bianbu-desktop.webp"
+  alt="Bianbu Linux desktop running on the Muse Pro Pi"
+  caption="Bianbu Desktop after setup. Image from Elephantronics' published introduction."
+  width={927}
+  height={496}
+/>
 
 :::note[Do not assume Raspberry Pi pin compatibility]
 The Muse Pro Pi has a 40-pin header, but a shared connector shape does not mean
@@ -103,8 +156,12 @@ Once the desktop is up, do a few checks before starting a project:
 - Shut down cleanly with the desktop menu or `sudo shutdown now`, then disconnect
   power. Do not pull power while the system is writing to storage.
 
-## Where to go next
+## Go deeper
 
+- [Muse Pro Pi benchmark deep dive](/single-board-computers/muse-pro-pi/benchmark-deep-dive/)
+  — storage, CPU, memory, thermal, and GPU results.
+- [Object detection with YOLOv8 on the Muse Pro Pi](/single-board-computers/muse-pro-pi/object-detection/)
+  — the SpacemiT AI SDK, model setup, and real troubleshooting.
 - [Single Board Computers](/single-board-computers/) for the broader context and
   planned topics.
 - [Circuit Design](/circuit-design/) before connecting anything to the GPIO
@@ -116,6 +173,6 @@ Once the desktop is up, do a few checks before starting a project:
 
 This page is based on
 [Introduction to MUSE Pi Pro](https://elephantronics.lk/Muse-intro.html) on
-elephantronics.lk. The specification table and first-boot outline follow that
-article. Measurements, thermal behaviour, and software compatibility have not
-been independently verified for this wiki.
+elephantronics.lk, with images from the same article. The specification table and
+first-boot outline follow that article. Measurements, thermal behaviour, and
+software compatibility have not been independently verified for this wiki.

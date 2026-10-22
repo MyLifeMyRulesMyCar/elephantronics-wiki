@@ -69,5 +69,6 @@ Schematic-only examples will say so.
 
 - [Microcontrollers](/microcontrollers/) for real-time I/O and motor control.
 - [Single Board Computers](/single-board-computers/) for Linux, vision, and ROS.
+- [Object detection on the Muse Pro Pi](/single-board-computers/muse-pro-pi/object-detection/) for a working vision pipeline.
 - [Circuit Design](/circuit-design/) for power and grounding checks.
 - [Troubleshooting](/troubleshooting/) when the robot does not move as expected.

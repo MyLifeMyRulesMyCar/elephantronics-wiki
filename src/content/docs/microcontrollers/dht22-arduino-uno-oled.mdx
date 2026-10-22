@@ -6,6 +6,7 @@ description: Read temperature and humidity from a DHT22 sensor and show live val
 import { CardGrid, Steps } from '@astrojs/starlight/components';
 import Callout from '../../../components/Callout.astro';
 import ComponentCard from '../../../components/ComponentCard.astro';
+import Figure from '../../../components/Figure.astro';
 import TutorialHeader from '../../../components/TutorialHeader.astro';
 import WiringTable from '../../../components/WiringTable.astro';
 
@@ -31,6 +32,24 @@ module and a 0.96-inch I2C OLED to an Arduino UNO and displays the readings.
   ]}
   note="Values in this page are examples. The DHT22 module pin order, the OLED I2C address, and the board revision all need to be checked against your hardware."
 />
+
+<Figure
+  src="/images/dht22-arduino-uno-oled/cover.webp"
+  alt="Wiring diagram showing an Arduino UNO connected to a DHT22 module and a 0.96-inch I2C OLED display"
+  caption="Example circuit from the source article. Wire colours are illustrative; follow the pin labels, not the colours."
+  width={1400}
+  height={747}
+  variant="cover"
+  priority
+/>
+
+## What you will learn
+
+- How a DHT22 sensor measures temperature and humidity
+- How to identify the pins on a three-pin DHT22 module
+- How to connect the sensor and an I2C OLED to an Arduino UNO
+- How to install the libraries and read both sensors
+- What to check when the display stays blank or the readings fail
 
 ## What you need
 
@@ -60,13 +79,45 @@ module and a 0.96-inch I2C OLED to an Arduino UNO and displays the readings.
   />
 </CardGrid>
 
+## The DHT22 sensor
+
+The DHT22 combines a temperature-sensing element, a humidity-sensing element, and
+a small controller in one package. The controller converts the measurements into
+a digital signal, which means the Arduino reads a value rather than calibrating an
+analog voltage.
+
+Typical datasheet figures for the DHT22 family are a temperature range of about
+−40 °C to 80 °C and a relative-humidity range of about 0–100% RH. Treat those as
+family-level figures and confirm the exact part on your module's datasheet.
+
+<Figure
+  src="/images/dht22-arduino-uno-oled/sensor.webp"
+  alt="DHT22 temperature and humidity sensor module with its grille and mounting hole"
+  caption="A three-pin DHT22 module. The pin order varies between breakouts, so read the labels on the board."
+  width={525}
+  height={380}
+  variant="narrow"
+/>
+
+## DHT22 module pinout
+
+The three-pin module used in this tutorial has VCC, DATA, and GND. The data line is
+a single-wire digital interface; the Arduino library handles the timing.
+
+<Figure
+  src="/images/dht22-arduino-uno-oled/pinout.webp"
+  alt="DHT22 module pinout labelled VCC, DATA, and GROUND"
+  caption="Example pin labels for the DHT22 module used in the source article. Some modules expose four pins; read the labels and datasheet for your part."
+  width={415}
+  height={556}
+  variant="narrow"
+/>
+
 ## How the DHT22 communicates
 
-The sensor measures temperature and humidity with two sensing elements and an
-internal controller. When the microcontroller requests a reading, the DHT22
-responds on its DATA line with a 40-bit message: humidity and temperature values
-plus a checksum byte. The Arduino library decodes that message and returns
-floating-point values.
+When the microcontroller requests a reading, the DHT22 responds on its DATA line
+with a 40-bit message: humidity and temperature values plus a checksum byte. The
+Arduino library decodes that message and returns floating-point values.
 
 Because the protocol is timing-sensitive, use a library rather than bit-banging
 the data line. The DHT22 family is also relatively slow; the source sketch waits
@@ -284,9 +335,37 @@ A successful build should show:
 | "OLED initialization failed!" | I2C wiring, display address, and that A4/A5 are the correct pins on your board |
 | "Failed to read from DHT22 sensor!" | DATA wire on D2, module power, and the pull-up requirement for a bare sensor |
 | Serial Monitor is empty | Correct port selected, baud rate 115200, and a USB data cable |
+| Readings show `nan` | The library could not obtain a valid frame; check DATA, power, and polling interval |
 | Values drift or look implausible | Let the sensor settle after power-up and keep it away from heat sources; compare with a known reference |
 
 For a broader routine, see [Troubleshooting](/troubleshooting/).
+
+## DHT22 vs DHT11
+
+If you are choosing between the two sensors, the DHT22 generally offers a wider
+range and better resolution. The trade-offs are qualitative in the source article:
+
+| Feature | DHT11 | DHT22 |
+| --- | --- | --- |
+| Temperature range | More limited | Wider |
+| Humidity range | More limited | Wider |
+| Resolution | Lower | Higher |
+| Measurement speed | Faster | Slower |
+| Accuracy | Lower | Better |
+| Cost | Lower | Higher |
+
+For projects where measurement quality matters more than cost, the DHT22 is
+usually the better choice. Confirm the exact figures in the datasheet for the part
+you buy.
+
+## Applications
+
+- Temperature and humidity monitoring
+- Smart-home and greenhouse systems
+- Smart agriculture and storage-condition monitoring
+- IoT environmental monitoring
+- Digital weather stations
+- Temperature and humidity alarms
 
 ## Next steps
 
@@ -301,8 +380,9 @@ For a broader routine, see [Troubleshooting](/troubleshooting/).
 
 This page is adapted from
 [DHT22 Humidity & Temperature Sensor with Arduino UNO and OLED Display](https://elephantronics.lk/dht22-article.html)
-on elephantronics.lk. The wiring tables, sketch, and serial output follow that
-article. Source images are not reproduced here.
+on elephantronics.lk. The wiring, sketch, images, and serial output follow that
+article. The source article's missing hero image is replaced with its circuit
+diagram.
 
 The circuit has not been assembled or measured for this wiki. Treat it as a
 reproducible starting point and record what you verify on your own hardware.

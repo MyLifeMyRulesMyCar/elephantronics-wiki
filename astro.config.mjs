@@ -14,10 +14,10 @@ export default defineConfig({
       description:
         'Practical electronics, embedded Linux, robotics, and edge AI tutorials.',
       logo: {
-        src: './src/assets/logo.svg',
+        src: './src/assets/logo.png',
         alt: 'Elephantronics',
       },
-      favicon: '/favicon.svg',
+      favicon: '/favicon.png',
       social: [
         {
           icon: 'github',
@@ -29,7 +29,19 @@ export default defineConfig({
         baseUrl:
           'https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/edit/main/',
       },
-      customCss: ['./src/styles/custom.css'],
+      customCss: [
+        '@fontsource/barlow/latin-400.css',
+        '@fontsource/barlow/latin-600.css',
+        '@fontsource/barlow/latin-700.css',
+        '@fontsource/barlow-condensed/latin-700.css',
+        '@fontsource/barlow-condensed/latin-800.css',
+        './src/styles/custom.css',
+      ],
+      expressiveCode: {
+        // The source articles use dark code blocks in both themes.
+        themes: ['github-dark'],
+        useStarlightDarkModeSwitch: false,
+      },
       lastUpdated: true,
       // The branded 404 lives in src/pages/404.astro.
       disable404Route: true,
@@ -66,6 +78,14 @@ export default defineConfig({
                 {
                   label: 'Introduction & first boot',
                   slug: 'single-board-computers/muse-pro-pi',
+                },
+                {
+                  label: 'Benchmark deep dive',
+                  slug: 'single-board-computers/muse-pro-pi/benchmark-deep-dive',
+                },
+                {
+                  label: 'Object detection',
+                  slug: 'single-board-computers/muse-pro-pi/object-detection',
                 },
               ],
             },

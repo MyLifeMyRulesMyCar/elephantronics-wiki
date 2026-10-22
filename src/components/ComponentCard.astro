@@ -16,12 +16,19 @@ const {
   shopUrl,
   shopLabel = 'Check availability at Elephantronics',
 } = Astro.props;
+
+const quantityLabel =
+  quantity === undefined
+    ? undefined
+    : typeof quantity === 'number'
+      ? `${quantity}×`
+      : quantity;
 ---
 
 <article class="component-card">
   <div class="head">
     <h3>{name}</h3>
-    {quantity && <span class="quantity">{quantity}&times;</span>}
+    {quantityLabel && <span class="quantity">{quantityLabel}</span>}
   </div>
 
   <p class="summary">{summary}</p>
@@ -51,10 +58,11 @@ const {
     flex-direction: column;
     gap: 0.6rem;
     height: 100%;
-    padding: 1.1rem 1.15rem;
+    padding: 1.15rem 1.2rem;
     border: 1px solid var(--sl-color-hairline);
-    border-radius: 0.5rem;
+    border-radius: 12px;
     background: var(--sl-color-bg);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.04);
   }
 
   .head {
@@ -66,8 +74,13 @@ const {
 
   h3 {
     margin: 0;
-    font-size: var(--sl-text-lg);
     color: var(--sl-color-white);
+    font-family: var(--el-font-heading);
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    text-transform: uppercase;
   }
 
   .quantity {
@@ -76,8 +89,10 @@ const {
     border: 1px solid var(--sl-color-hairline);
     border-radius: 999px;
     color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-xs);
+    font-family: var(--el-font-heading);
+    font-size: 0.75rem;
     font-weight: 600;
+    letter-spacing: 0.05em;
   }
 
   .summary {
@@ -96,8 +111,10 @@ const {
 
   .label {
     color: var(--sl-color-gray-3);
-    font-size: var(--sl-text-xs);
-    letter-spacing: 0.03em;
+    font-family: var(--el-font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 

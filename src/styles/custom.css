@@ -1,60 +1,66 @@
 /*
- * Elephantronics Wiki brand layer for Starlight.
+ * Elephantronics Wiki theme for Starlight.
  *
- * Starlight ships a full theme via CSS custom properties. We override the
- * palette, then add only a few restrained touches. Custom CSS is unlayered,
- * so it takes precedence over Starlight's layered defaults.
+ * Visual language follows the Elephantronics article pages: Barlow /
+ * Barlow Condensed, a deep orange accent, navy technical surfaces, white
+ * cards, and restrained rules. Colours used for text meet WCAG AA; the
+ * brighter brand orange is reserved for fills and large accents.
  */
 
 :root {
-  /* Brand tokens */
+  /* Elephantronics article palette */
   --el-orange: #ff6b00;
-  --el-orange-soft: #ffb27a;
-  --el-orange-deep: #a63f00;
-  --el-orange-ink: #7a2f00;
+  --el-orange-deep: #e8470a;
+  --el-orange-link: #b34700;
+  --el-orange-link-hover: #933500;
+  --el-orange-bright: #ff6b35;
   --el-navy: #151b2b;
-  --el-navy-950: #0e1320;
-  --el-navy-900: #111827;
-  --el-navy-800: #1b2335;
-  --el-navy-700: #273149;
-  --el-line-dark: #2a354b;
-  --el-gray-050: #f7f8fa;
-  --el-gray-100: #eef0f4;
-  --el-gray-200: #e2e6ed;
+  --el-ink: #1a1f2e;
+  --el-darker: #0f1318;
+  --el-surface: #f2f4f7;
+  --el-border: #e2e6ed;
+  --el-muted: #5b6475;
   --el-focus-dark: #ffb27a;
   --el-focus-light: #a63f00;
+
+  --el-font-body:
+    'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --el-font-heading: 'Barlow Condensed', 'Arial Narrow', sans-serif;
 
   /* Dark theme (Starlight's default root) */
   --sl-color-white: #ffffff;
   --sl-color-gray-1: #e8ebf2;
   --sl-color-gray-2: #c3c9d6;
-  --sl-color-gray-3: #929bb0;
-  --sl-color-gray-4: #5f6a80;
-  --sl-color-gray-5: var(--el-line-dark);
-  --sl-color-gray-6: var(--el-navy-800);
+  --sl-color-gray-3: #9aa3b5;
+  --sl-color-gray-4: #626d82;
+  --sl-color-gray-5: #2a354b;
+  --sl-color-gray-6: #1a2233;
   --sl-color-black: var(--el-navy);
 
   --sl-color-bg: var(--el-navy);
-  --sl-color-bg-nav: var(--el-navy-900);
-  --sl-color-bg-sidebar: var(--el-navy-900);
+  --sl-color-bg-nav: var(--el-darker);
+  --sl-color-bg-sidebar: #121826;
   --sl-color-bg-inline-code: #222c40;
   --sl-color-hairline: #232d41;
-  --sl-color-hairline-light: var(--el-line-dark);
-  --sl-color-hairline-shade: var(--el-navy);
+  --sl-color-hairline-light: #2a354b;
+  --sl-color-hairline-shade: var(--el-darker);
 
   --sl-color-accent-low: #3d1d07;
   --sl-color-accent: var(--el-orange);
-  --sl-color-accent-high: var(--el-orange-soft);
-  --sl-color-text-accent: var(--el-orange-soft);
+  --sl-color-accent-high: var(--el-orange-bright);
+  --sl-color-text-accent: var(--el-orange-bright);
   --sl-color-bg-accent: var(--el-orange);
   --sl-color-text-invert: var(--el-navy);
 
-  /* Typography: system fonts, no network dependency. */
+  /* Typography */
+  --sl-font: var(--el-font-body);
   --sl-font-mono:
     'Cascadia Code', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
-  --sl-content-width: 47rem;
-  --sl-line-height: 1.7;
+  --sl-content-width: 48rem;
+  --sl-line-height: 1.72;
+  --sl-text-base: 1.0625rem;
 }
 
 :root[data-theme='light'] {
@@ -63,25 +69,25 @@
   --sl-color-gray-2: #333c4d;
   --sl-color-gray-3: #5b6475;
   --sl-color-gray-4: #8991a1;
-  --sl-color-gray-5: var(--el-gray-200);
-  --sl-color-gray-6: var(--el-gray-100);
-  --sl-color-gray-7: var(--el-gray-050);
+  --sl-color-gray-5: #dfe3ea;
+  --sl-color-gray-6: #eef0f4;
+  --sl-color-gray-7: #f7f8fa;
   --sl-color-black: #ffffff;
 
   --sl-color-bg: #ffffff;
-  --sl-color-bg-nav: var(--el-gray-050);
+  --sl-color-bg-nav: #ffffff;
   --sl-color-bg-sidebar: #ffffff;
-  --sl-color-bg-inline-code: var(--el-gray-100);
-  --sl-color-hairline: var(--el-gray-200);
-  --sl-color-hairline-light: var(--el-gray-100);
+  --sl-color-bg-inline-code: var(--el-surface);
+  --sl-color-hairline: var(--el-border);
+  --sl-color-hairline-light: #edf0f4;
   --sl-color-hairline-shade: #ffffff;
 
   --sl-color-accent-low: #fff0e6;
-  --sl-color-accent: #b34700;
-  --sl-color-accent-high: var(--el-orange-ink);
-  --sl-color-text-accent: #b34700;
-  --sl-color-bg-accent: var(--el-orange);
-  --sl-color-text-invert: var(--el-navy);
+  --sl-color-accent: var(--el-orange-link);
+  --sl-color-accent-high: #7a2f00;
+  --sl-color-text-accent: var(--el-orange-link);
+  --sl-color-bg-accent: #c73a06;
+  --sl-color-text-invert: #ffffff;
 }
 
 html {
@@ -94,8 +100,25 @@ html {
   }
 }
 
+body {
+  font-family: var(--el-font-body);
+}
+
+/* Keep wide media and tables inside the content column on small screens. */
+main,
+.sl-container,
+.sl-markdown-content {
+  min-width: 0;
+}
+
+.sl-markdown-content img,
+.sl-markdown-content video {
+  max-width: 100%;
+  height: auto;
+}
+
 ::selection {
-  background: rgb(255 107 0 / 0.28);
+  background: rgb(255 107 0 / 0.24);
 }
 
 :focus-visible {
@@ -107,75 +130,500 @@ html {
   outline-color: var(--el-focus-light);
 }
 
-/* Headings: tighter tracking, a technical rule between top-level sections. */
+/* Typography */
 h1,
 h2,
 h3,
-h4 {
-  letter-spacing: -0.015em;
+h4,
+h5 {
+  font-family: var(--el-font-heading);
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
-.sl-markdown-content > h2 {
-  border-top: 1px solid var(--sl-color-hairline);
-  padding-top: 1.6rem;
-  margin-top: 2.75rem;
+h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.sl-markdown-content > h2:first-child {
+h2 {
+  font-weight: 800;
+  letter-spacing: 0.015em;
+}
+
+h3 {
+  font-weight: 700;
+}
+
+strong {
+  font-weight: 600;
+}
+
+/* Page titles get the article's short orange rule. */
+main > .content-panel:first-of-type h1#_top::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 5px;
+  margin-top: 1.15rem;
+  border-radius: 3px;
+  background: var(--el-orange-deep);
+}
+
+.hero h1#_top::after {
+  content: none;
+}
+
+/* Section headings mirror the article cards. */
+.sl-markdown-content > h2,
+.sl-markdown-content .sl-heading-wrapper.level-h2 > h2 {
+  margin-top: 2.85rem;
+  padding: 0.05rem 0 0.05rem 0.85rem;
   border-top: 0;
-  padding-top: 0;
+  border-left: 4px solid var(--el-orange);
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.sl-markdown-content > h2:first-child,
+.sl-markdown-content .sl-heading-wrapper.level-h2:first-child > h2 {
   margin-top: 0;
 }
 
-/* Splash hero */
-.hero > h1 {
-  letter-spacing: -0.035em;
+.sl-markdown-content > h3,
+.sl-markdown-content .sl-heading-wrapper.level-h3 > h3 {
+  margin-top: 2.1rem;
+  font-size: 1.3rem;
+  line-height: 1.25;
 }
 
-.hero > h1::before {
-  content: '';
-  display: block;
-  width: 3rem;
-  height: 4px;
-  margin-bottom: 1.25rem;
-  border-radius: 999px;
-  background: var(--el-orange);
+/* Links follow the article accent, with an AA-safe light-mode shade. */
+.sl-markdown-content a {
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
 }
 
-.hero .tagline {
-  max-width: 46rem;
-  color: var(--sl-color-gray-2);
+.sl-markdown-content a:hover {
+  color: var(--el-orange-bright);
 }
 
-/* Cards keep Starlight's structure; branding is a border and a small lift. */
-.card {
-  border-radius: 0.6rem;
+:root[data-theme='light'] .sl-markdown-content a:hover {
+  color: var(--el-orange-link-hover);
+}
+
+/* Markdown tables: dark technical headers and subtle zebra rows. */
+.sl-markdown-content > table {
+  width: 100%;
+  margin-block: 1.25rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.sl-markdown-content > table th {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+  background: var(--el-ink);
+  color: #ffffff;
+  font-family: var(--el-font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.sl-markdown-content > table td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+  vertical-align: top;
+}
+
+.sl-markdown-content > table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--sl-color-bg) 94%, var(--el-ink) 6%);
+}
+
+.sl-markdown-content > table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Cards */
+.card,
+.sl-link-card {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 14px;
+  background: var(--sl-color-bg);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.04);
   transition:
-    border-color 140ms ease,
-    transform 140ms ease;
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.card:hover {
-  border-color: var(--sl-color-accent);
+.card:hover,
+.sl-link-card:hover {
+  border-color: var(--el-orange);
+  background: var(--sl-color-bg);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.08);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .card:hover {
+  .card:hover,
+  .sl-link-card:hover {
     transform: translateY(-2px);
   }
 }
 
-/* Tables in prose */
-.sl-markdown-content table {
+.card :is(h2, h3, .title),
+.sl-link-card .title {
+  font-family: var(--el-font-heading);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.sl-link-card {
+  padding: 1.15rem 1.2rem;
+}
+
+.sl-link-card .description {
+  color: var(--sl-color-gray-3);
   font-size: var(--sl-text-sm);
 }
 
-.sl-markdown-content th {
-  background: var(--sl-color-gray-6);
+.sl-link-card:hover .icon {
+  color: var(--el-orange-deep);
 }
 
-/* Code blocks: slightly tighter radius to match the component cards. */
+/* Three-column principle cards */
+.principle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.principle {
+  padding: 1.15rem 1.2rem;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 12px;
+  background: var(--sl-color-bg);
+}
+
+.principle h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--el-font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.principle p {
+  margin: 0;
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  line-height: 1.6;
+}
+
+/* Contribute call-to-action */
+.wiki-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 3.5rem;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  border-radius: 16px;
+  background: linear-gradient(120deg, var(--el-ink), #2d3548);
+  color: #ffffff;
+}
+
+.wiki-cta h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  line-height: 1.05;
+}
+
+.wiki-cta p {
+  max-width: 58ch;
+  margin: 0.55rem 0 0;
+  color: rgb(255 255 255 / 0.66);
+  font-size: var(--sl-text-sm);
+  line-height: 1.6;
+}
+
+.wiki-cta .cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.wiki-cta .cta-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wiki-cta .cta-primary {
+  background: var(--el-orange);
+  color: var(--el-navy);
+}
+
+.wiki-cta .cta-primary:hover {
+  background: #ff8a3d;
+  color: var(--el-navy);
+}
+
+.wiki-cta .cta-ghost {
+  border-color: rgb(255 255 255 / 0.3);
+  color: #ffffff;
+}
+
+.wiki-cta .cta-ghost:hover {
+  border-color: var(--el-orange);
+  color: #ffb27a;
+}
+
+@media (max-width: 56rem) {
+  .principle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Starlight asides become the article's soft callout panels. */
+.starlight-aside {
+  padding: 1rem 1.15rem;
+  border-radius: 0 8px 8px 0;
+  border-left-width: 5px;
+}
+
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--sl-color-text-accent);
+  --sl-color-asides-border: var(--el-orange);
+  background-color: color-mix(in srgb, var(--sl-color-bg) 92%, var(--el-orange) 8%);
+}
+
+.starlight-aside--tip {
+  --sl-color-asides-text-accent: var(--sl-color-green-high);
+  --sl-color-asides-border: var(--sl-color-green);
+  background-color: var(--sl-color-green-low);
+}
+
+/* Code frames */
 .expressive-code .frame {
-  border-radius: 0.5rem;
+  border-radius: 10px;
+}
+
+/* Header branding */
+.site-title span {
+  font-family: var(--el-font-heading);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.site-title img {
+  border-radius: 8px;
+}
+
+/* Splash hero: a dark, technical panel in the article style. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  padding: clamp(2rem, 5vw, 4.25rem);
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 22px;
+  background:
+    radial-gradient(90% 120% at 88% 10%, rgb(255 107 0 / 0.17) 0%, transparent 55%),
+    linear-gradient(135deg, #0b101b 0%, #151b2b 55%, #1a1f2e 100%);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.22);
+  color: #ffffff;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--el-orange), transparent 70%);
+}
+
+.hero h1 {
+  max-width: none;
+  color: #ffffff;
+  font-family: var(--el-font-heading);
+  font-size: clamp(3rem, 7vw, 5.6rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+}
+
+.hero-brand-a {
+  color: var(--el-orange);
+}
+
+.hero-brand-b {
+  color: #ffffff;
+}
+
+.hero-wiki {
+  color: #ffb27a;
+}
+
+.hero .tagline {
+  max-width: 52ch;
+  color: #c3c9d6;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.65;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1.15rem;
+  color: var(--el-orange-bright);
+  font-family: var(--el-font-heading);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 1.9rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--el-orange);
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.hero-badges > span {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.045);
+  color: #e8ebf2;
+  font-family: var(--el-font-heading);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.hero .actions {
+  gap: 0.75rem;
+}
+
+.hero .sl-link-button.primary {
+  border-color: transparent;
+  background: var(--el-orange);
+  color: var(--el-navy);
+}
+
+.hero .sl-link-button.primary:hover {
+  background: #ff8a3d;
+  color: var(--el-navy);
+}
+
+.hero .sl-link-button.secondary {
+  border-color: rgb(255 255 255 / 0.3);
+  color: #ffffff;
+}
+
+.hero .sl-link-button.secondary:hover {
+  border-color: var(--el-orange);
+  color: #ffb27a;
+}
+
+.hero .hero-html img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 50rem) {
+  .hero .hero-html {
+    display: none;
+  }
+
+  .hero .copy,
+  .hero .stack,
+  .hero .tagline,
+  .hero .actions {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .hero-eyebrow,
+  .hero-badges {
+    justify-content: center;
+  }
+
+  .hero .actions {
+    justify-content: center;
+  }
+}
+
+/* Reusable home-page grids */
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 72rem) {
+  .topic-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 56rem) {
+  .featured-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 44rem) {
+  .topic-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Home page print layout */
+@media print {
+  .hero,
+  .featured-grid,
+  .topic-grid,
+  .wiki-cta {
+    break-inside: avoid;
+  }
 }

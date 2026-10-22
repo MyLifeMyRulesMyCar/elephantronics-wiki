@@ -164,17 +164,19 @@ missing from navigation, the sidebar entry is the usual cause.
 
 The tutorial example is
 [`dht22-arduino-uno-oled.mdx`](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/blob/main/src/content/docs/microcontrollers/dht22-arduino-uno-oled.mdx).
-It demonstrates all four shared components:
+It demonstrates the shared documentation components:
 
 - `TutorialHeader` — difficulty, time, prerequisites, and verification status.
 - `ComponentCard` — component name, summary, and optional shop link.
 - `WiringTable` — accessible pin-to-pin connection tables.
 - `Callout` — note, tip, and warning boxes.
+- `Figure` — image or animated WebP with alt text, caption, and dimensions.
 
 From a page two folders deep, import them like this:
 
 ```mdx
 import Callout from '../../../components/Callout.astro';
+import Figure from '../../../components/Figure.astro';
 import TutorialHeader from '../../../components/TutorialHeader.astro';
 ```
 
@@ -184,9 +186,12 @@ Expressive Code features; do not add a custom code wrapper.
 
 ### Images and screenshots
 
-- Put images under `public/images/` and reference them with a root-relative path:
-  `/images/your-image.png`.
-- Keep files reasonably compressed. Very large screenshots slow the site down.
+- Put images under `public/images/<page-slug>/` and reference them with a
+  root-relative path such as `/images/your-page/figure.webp`.
+- Use WebP for static images and animated WebP for short demos. Keep files
+  compressed; avoid committing multi-megabyte GIFs.
+- Use the `Figure` component so images get dimensions, a caption, and a white
+  backing that keeps charts readable in dark mode.
 - Write useful alt text describing what the image shows.
 - Only upload images you have the right to publish. Do not hotlink images from
   other sites or copy copyrighted diagrams.

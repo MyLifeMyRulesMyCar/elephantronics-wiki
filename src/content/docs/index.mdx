@@ -7,22 +7,53 @@ head:
   - tag: title
     content: Elephantronics Wiki — Practical electronics, embedded Linux, robotics, and edge AI
 hero:
-  title: Elephantronics Wiki
-  tagline: POWERING YOUR IDEAS. Practical electronics, embedded Linux, robotics, and edge AI — documented one build at a time.
+  title: '<span class="hero-brand-a">Elephant</span><span class="hero-brand-b">ronics</span><br /><span class="hero-wiki">Wiki</span>'
+  tagline: |
+    <span class="hero-eyebrow">Powering your ideas</span>
+    <span class="hero-badges"><span>Electronics</span><span>Embedded Linux</span><span>Robotics</span><span>Edge AI</span></span>
+    Practical electronics, embedded Linux, robotics, and edge AI — documented one build at a time.
+  image:
+    html: '<img src="/images/home/hero-circuit.svg" alt="" width="520" height="420" />'
   actions:
     - text: Start here
       link: /getting-started/
       icon: right-arrow
       variant: primary
-    - text: DHT22 + Arduino UNO
+    - text: Build the DHT22 tutorial
       link: /microcontrollers/dht22-arduino-uno-oled/
       icon: right-arrow
-      variant: minimal
+      variant: secondary
 ---
 
-import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { LinkCard } from '@astrojs/starlight/components';
+import FeaturedCard from '../../components/FeaturedCard.astro';
 
-<CardGrid>
+## Featured builds
+
+<div class="featured-grid">
+  <FeaturedCard
+    href="/microcontrollers/dht22-arduino-uno-oled/"
+    image="/images/dht22-arduino-uno-oled/cover.webp"
+    alt="Wiring diagram showing an Arduino UNO connected to a DHT22 module and an I2C OLED display"
+    tag="Beginner tutorial"
+    title="DHT22 + Arduino UNO + OLED"
+    summary="Read temperature and humidity, wire an I2C display, and check every connection before power-up."
+    meta="Arduino UNO · DHT22 · SSD1306"
+  />
+  <FeaturedCard
+    href="/single-board-computers/muse-pro-pi/benchmark-deep-dive/"
+    image="/images/muse-pro-pi/benchmark/cover.webp"
+    alt="Muse Pro Pi benchmark cover with the board, RISC-V terminal output, and performance graphs"
+    tag="Benchmark deep dive"
+    title="MUSE Pi Pro performance"
+    summary="Storage, CPU, memory, thermal, and GPU results compared with published Raspberry Pi numbers."
+    meta="RISC-V · Linux · Benchmarks"
+  />
+</div>
+
+## Browse by topic
+
+<div class="topic-grid">
   <LinkCard
     title="Electronics Fundamentals"
     href="/electronics-fundamentals/"
@@ -53,32 +84,45 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
     href="/troubleshooting/"
     description="A repeatable first-checks routine for circuits that refuse to work."
   />
-</CardGrid>
-
-## Start with a track
-
-- **New to electronics.** Read [Electronics Fundamentals](/electronics-fundamentals/), then build the [DHT22 + Arduino UNO tutorial](/microcontrollers/dht22-arduino-uno-oled/).
-- **Ready to build.** Go straight to the [DHT22 tutorial](/microcontrollers/dht22-arduino-uno-oled/), then use the [circuit design checklist](/circuit-design/) before powering anything new.
-- **Moving to embedded Linux.** Start with the [Single Board Computers overview](/single-board-computers/) and the [Muse Pro Pi introduction](/single-board-computers/muse-pro-pi/).
+</div>
 
 ## How this wiki works
 
-**Verification status is explicit.** Every tutorial states whether it is a draft or
-has been reviewed. A draft is written from cited sources, but it has not been
-bench-tested for this wiki. Treat its wiring, code, and output as a starting
-point, not a guarantee.
+<div class="principle-grid">
+  <div class="principle">
+    <h3>Draft first</h3>
+    <p>
+      Every tutorial states whether it is a draft or has been reviewed. A draft is
+      written from cited sources but has not been bench-tested for this wiki.
+    </p>
+  </div>
+  <div class="principle">
+    <h3>Examples labelled</h3>
+    <p>
+      Pin numbers, addresses, and component values are examples unless a page says
+      otherwise. Board revisions and module pinouts differ.
+    </p>
+  </div>
+  <div class="principle">
+    <h3>Sources cited</h3>
+    <p>
+      Vendor specifications are presented as published, with a link. Values that
+      have not been measured are not presented as verified.
+    </p>
+  </div>
+</div>
 
-**Example values are labelled.** Pin numbers, addresses, and component values are
-examples unless a page says otherwise. Board revisions and module pinouts differ,
-so check the silkscreen and the datasheet for the part in your hand.
-
-**Sources are cited.** Vendor specifications are presented as published, with a
-link to the source. If a value has not been independently measured, the page says
-so.
-
-:::note[Safety first]
-The wiki focuses on low-voltage DC electronics. Mains wiring, high-current
-batteries, and anything that can injure you are out of scope. Disconnect power
-before changing a circuit, and use a certified supply for anything that connects
-to the wall.
-:::
+<div class="wiki-cta">
+  <div>
+    <h2>Build it. Document it. Help the next person.</h2>
+    <p>
+      Found a wrong pin, a clearer way to explain a concept, or a build worth
+      sharing? The contributor guide walks through a fork, a local preview, and a
+      pull request.
+    </p>
+  </div>
+  <div class="cta-actions">
+    <a class="cta-primary" href="/contributing/">Contributor guide <span aria-hidden="true">→</span></a>
+    <a class="cta-ghost" href="/getting-started/">Start here</a>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+---
+interface Props {
+  href: string;
+  image: string;
+  alt: string;
+  tag: string;
+  title: string;
+  summary: string;
+  meta?: string;
+}
+
+const { href, image, alt, tag, title, summary, meta } = Astro.props;
+---
+
+<a class="featured-card" href={href}>
+  <div class="media">
+    <img src={image} alt={alt} loading="eager" decoding="async" />
+  </div>
+  <div class="body">
+    <span class="tag">{tag}</span>
+    <h3>{title}</h3>
+    <p class="summary">{summary}</p>
+    {meta && <p class="meta">{meta}</p>}
+    <span class="read" aria-hidden="true">Read the guide <span>→</span></span>
+  </div>
+</a>
+
+<style>
+  .featured-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 14px;
+    background: var(--sl-color-bg);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.04);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 160ms ease,
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .featured-card:hover {
+    border-color: var(--el-orange);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 0.1);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .featured-card:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  .media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--el-ink);
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+
+  .media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.01);
+    transition: transform 300ms ease;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .featured-card:hover .media img {
+      transform: scale(1.04);
+    }
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.15rem 1.25rem 1.3rem;
+  }
+
+  .tag {
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-family: var(--el-font-heading);
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+
+  .summary {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+  }
+
+  .meta {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+  }
+
+  .read {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+  }
+
+  .read span {
+    transition: transform 160ms ease;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .featured-card:hover .read span {
+      transform: translateX(3px);
+    }
+  }
+</style>
