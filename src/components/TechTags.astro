@@ -1,0 +1,41 @@
+---
+interface Props {
+  tags: string[];
+}
+
+const { tags } = Astro.props;
+---
+
+<ul class="tech-tags" aria-label="Topics">
+  {tags.map((tag) => <li>{tag}</li>)}
+</ul>
+
+<style>
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0 0 1.6rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    padding: 0.28rem 0.65rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 5px;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-2);
+    font-family: var(--el-font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  li:first-child {
+    border-color: color-mix(in srgb, var(--el-orange) 55%, var(--sl-color-hairline));
+    color: var(--sl-color-text-accent);
+  }
+</style>

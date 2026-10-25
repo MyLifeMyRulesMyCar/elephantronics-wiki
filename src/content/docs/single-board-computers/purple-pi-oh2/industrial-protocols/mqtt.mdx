@@ -1,0 +1,159 @@
+---
+title: MQTT on the Purple Pi OH2
+description: Install Mosquitto on the Purple Pi OH2, configure a local MQTT broker, and test publish/subscribe messaging.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['MQTT', 'Mosquitto', 'IoT', 'Publish/Subscribe']} />
+
+<TutorialHeader
+  difficulty="Intermediate"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'A user with sudo access',
+    'Network access for the Mosquitto packages',
+  ]}
+  note="The source enables anonymous MQTT access for testing. Do not expose that configuration to an untrusted network."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/mqtt-overview.webp"
+  alt="MQTT publish and subscribe model with clients and a broker"
+  caption="MQTT clients publish messages to topics through a broker; subscribers receive matching topics."
+  width={1400}
+  height={559}
+  variant="cover"
+/>
+
+MQTT is a lightweight publish/subscribe protocol for IoT and embedded systems. A
+broker receives messages from publishers and forwards them to clients subscribed
+to the matching topic.
+
+## How MQTT works
+
+- **Client:** any device or application that publishes or subscribes.
+- **Broker:** the central server that routes messages.
+- **Topic:** a hierarchical name such as `home/kitchen/temperature`.
+- **QoS:** the delivery guarantee level requested for a subscription.
+
+A publisher sends a message to a topic; the broker forwards it to subscribers.
+Publishers and subscribers do not need to know about each other.
+
+## Install Mosquitto
+
+```bash
+sudo apt update
+sudo apt install -y mosquitto mosquitto-clients
+sudo systemctl enable mosquitto.service
+```
+
+Check that the broker starts:
+
+```bash
+mosquitto -v
+```
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/mqtt-broker.webp"
+  alt="Mosquitto broker starting in a terminal"
+  caption="Mosquitto starting in verbose mode."
+  width={794}
+  height={256}
+/>
+
+## Enable remote access for testing
+
+The default configuration may listen only on localhost. To allow other devices on
+the LAN to connect, edit:
+
+```bash
+sudo nano /etc/mosquitto/mosquitto.conf
+```
+
+Add:
+
+```text
+listener 1883
+allow_anonymous true
+```
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/mqtt-config.webp"
+  alt="Mosquitto configuration file with listener 1883 and allow_anonymous true"
+  caption="The test configuration opens port 1883 and allows anonymous clients."
+  width={824}
+  height={506}
+/>
+
+Restart the service:
+
+```bash
+sudo systemctl restart mosquitto
+```
+
+<Callout variant="warning" title="Anonymous access is for testing only">
+  `allow_anonymous true` lets anyone who can reach port 1883 publish and
+  subscribe. For anything beyond a closed test network, configure authentication,
+  access control lists, TLS, and a firewall.
+</Callout>
+
+## Test publish and subscribe
+
+Terminal 1, subscribe:
+
+```bash
+mosquitto_sub -h localhost -t "test" -v
+```
+
+Terminal 2, publish:
+
+```bash
+mosquitto_pub -h localhost -t "test" -m "Hello from Purple Pi!"
+```
+
+The message should appear in the subscriber terminal.
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/mqtt-test.webp"
+  alt="Two terminals showing an MQTT subscriber receiving a published test message"
+  caption="A local publish/subscribe test with Mosquitto."
+  width={1400}
+  height={441}
+/>
+
+## Test from another device
+
+Use the board's IP address instead of `localhost`:
+
+```bash
+mosquitto_sub -h <purple-pi-ip> -t "test" -v
+mosquitto_pub -h <purple-pi-ip> -t "test" -m "hello from the LAN"
+```
+
+If the connection fails, check the listener, firewall, and whether the broker is
+bound to the expected interface.
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| Connection refused on 1883 | `systemctl status mosquitto`, listener configuration, firewall |
+| Works on localhost but not over LAN | Listener binding and firewall rules |
+| Authentication errors | The source test config has no authentication; check your own config |
+| Messages not delivered | Topic spelling, QoS, and subscription filters |
+
+## Related pages
+
+- [Industrial protocols overview](/single-board-computers/purple-pi-oh2/industrial-protocols/)
+- [Node-RED on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/node-red/)
+- [Modbus RTU](/single-board-computers/purple-pi-oh2/industrial-protocols/modbus/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 MQTT guide. The test configuration is
+intentionally insecure and must not be used as a production broker setup.

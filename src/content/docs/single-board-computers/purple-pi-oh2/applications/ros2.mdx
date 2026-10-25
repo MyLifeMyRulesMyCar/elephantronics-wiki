@@ -1,0 +1,154 @@
+---
+title: ROS 2 Humble on the Purple Pi OH2
+description: Install ROS 2 Humble on the Purple Pi OH2, source the environment, and run the talker/listener and Turtlesim demos.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['ROS 2', 'Humble', 'Robotics', 'Python']} />
+
+<TutorialHeader
+  difficulty="Advanced"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running an Ubuntu 22.04-based image',
+    'A user with sudo access',
+    'Network access for the ROS 2 repository and packages',
+  ]}
+  note="ROS 2 Humble targets Ubuntu 22.04. A Debian or Buildroot image may not have compatible packages; check the OS before starting."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/applications/ros2-banner.webp"
+  alt="ROS 2 robotics software framework"
+  caption="ROS 2 provides publish/subscribe communication, tools, and simulation packages for robotics."
+  width={1200}
+  height={670}
+  variant="cover"
+/>
+
+ROS 2 is a framework for building robotics and automation systems. It provides
+process-to-process communication, sensor and actuator abstractions, simulation
+tools, and a large package ecosystem.
+
+<Callout variant="warning" title="OS compatibility">
+  ROS 2 Humble is built for Ubuntu 22.04. The repository line in this guide uses
+  `$UBUNTU_CODENAME`, so it will not magically make Debian or Buildroot
+  compatible. Verify your distribution before installing.
+</Callout>
+
+## Set up the locale
+
+```bash
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+```
+
+## Add the ROS 2 repository
+
+```bash title="Required tools"
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+sudo apt update && sudo apt install curl -y
+```
+
+```bash title="Add the ROS 2 GPG key"
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+  -o /usr/share/keyrings/ros-archive-keyring.gpg
+```
+
+```bash title="Add the repository"
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" \
+  | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
+
+## Install ROS 2 Humble
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-humble-desktop
+sudo apt install ros-dev-tools
+```
+
+## Set up the environment
+
+```bash
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+
+## Verify with talker and listener
+
+Open two terminals.
+
+Terminal 1:
+
+```bash
+ros2 run demo_nodes_cpp talker
+```
+
+Terminal 2:
+
+```bash
+ros2 run demo_nodes_py listener
+```
+
+The listener should receive the messages published by the talker.
+
+<Figure
+  src="/images/purple-pi-oh2/applications/ros2-test.webp"
+  alt="ROS 2 talker and listener terminals exchanging messages"
+  caption="ROS 2 talker and listener running on the Purple Pi OH2."
+  width={1200}
+  height={420}
+/>
+
+## Run Turtlesim
+
+Start the simulator:
+
+```bash
+ros2 run turtlesim turtlesim_node
+```
+
+In another terminal, start the keyboard controller:
+
+```bash
+ros2 run turtlesim turtle_teleop_key
+```
+
+Use the arrow keys in the terminal to move the turtle.
+
+<Figure
+  src="/images/purple-pi-oh2/applications/turtlesim.webp"
+  alt="Turtlesim window with a turtle and movement trail"
+  caption="Turtlesim after moving the turtle with the keyboard controller."
+  width={1054}
+  height={474}
+/>
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `apt` cannot find ROS packages | Confirm Ubuntu 22.04 and that the repository file was created |
+| `ros2: command not found` | Source `/opt/ros/humble/setup.bash` in the current shell |
+| Talker and listener do not communicate | Check both terminals use the same ROS domain and network |
+| Turtlesim cannot open a window | Run on a local display or forward X11 over SSH |
+
+## Related pages
+
+- [Docker on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/docker/)
+- [OpenCV on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/opencv/)
+- [Robotics](/robotics/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 ROS 2 guide. The procedure has not been
+independently verified for this wiki.

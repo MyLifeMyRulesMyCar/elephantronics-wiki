@@ -1,0 +1,58 @@
+---
+title: Industrial protocols
+description: Connect the Purple Pi OH2 to Modbus RTU, MQTT, and CAN bus networks, with wiring, Python examples, and troubleshooting.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Callout from '../../../../../components/Callout.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+
+<TechTags tags={['Modbus RTU', 'MQTT', 'CAN bus', 'RS-485']} />
+
+The Purple Pi OH2 can act as a bridge between field devices and higher-level
+software. This section covers three common industrial protocols:
+
+- **Modbus RTU** over an RS-485 transceiver connected to UART7.
+- **MQTT** with a Mosquitto broker for publish/subscribe messaging.
+- **CAN bus** with an MCP2515 controller connected to SPI0.
+
+<Callout variant="warning" title="Draft documentation">
+  The procedures are adapted from Elephantronics' Purple Pi OH2 documentation and
+  have not been independently verified for this wiki. RS-485 and CAN wiring
+  mistakes can damage transceivers; check polarity, supply voltage, and
+  termination before powering the bus.
+</Callout>
+
+## Common prerequisites
+
+- A Purple Pi OH2 with a Debian or Ubuntu image.
+- SSH or local terminal access.
+- Python 3 and a virtual environment for the example scripts.
+- The specific transceiver or controller module described on each page.
+
+## Choose a protocol
+
+<CardGrid>
+  <LinkCard
+    title="Modbus RTU"
+    href="/single-board-computers/purple-pi-oh2/industrial-protocols/modbus/"
+    description="Wire an RS-485 transceiver to UART7 and read holding registers with minimalmodbus."
+  />
+  <LinkCard
+    title="MQTT"
+    href="/single-board-computers/purple-pi-oh2/industrial-protocols/mqtt/"
+    description="Install Mosquitto, publish and subscribe to topics, and test the broker locally."
+  />
+  <LinkCard
+    title="CAN bus"
+    href="/single-board-computers/purple-pi-oh2/industrial-protocols/can-bus/"
+    description="Connect an MCP2515 over SPI0, then send, receive, filter, and log CAN frames."
+  />
+</CardGrid>
+
+## Related pages
+
+- [Purple Pi OH2 overview](/single-board-computers/purple-pi-oh2/)
+- [GPIO and interfaces](/single-board-computers/purple-pi-oh2/gpio/)
+- [Applications](/single-board-computers/purple-pi-oh2/applications/)
+- [NPU and AI](/single-board-computers/purple-pi-oh2/npu/)

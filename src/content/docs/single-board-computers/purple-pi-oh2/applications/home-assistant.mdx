@@ -1,0 +1,160 @@
+---
+title: Home Assistant on the Purple Pi OH2
+description: Run Home Assistant Container on the Purple Pi OH2 with Docker, access the dashboard on port 8123, and manage updates safely.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['Home Assistant', 'Docker', 'Smart Home']} />
+
+<TutorialHeader
+  difficulty="Intermediate"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 with Docker installed',
+    'Network access for the container image',
+    'A user with sudo access',
+  ]}
+  note="Home Assistant Container is not the Home Assistant OS. Add-ons and the supervisor are not included. Check what your chosen installation method supports before migrating a live system."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/applications/home-assistant.webp"
+  alt="Home Assistant home-automation dashboard concept"
+  caption="Home Assistant is a local home-automation platform with a browser dashboard."
+  width={1200}
+  height={670}
+  variant="cover"
+/>
+
+Home Assistant is an open-source home-automation platform. It runs on the local
+network, integrates smart devices, and provides automations and a dashboard. This
+guide runs the official container image with Docker.
+
+## Verify Docker
+
+```bash
+docker -v
+sudo systemctl status docker
+docker run hello-world
+dpkg --print-architecture
+```
+
+The architecture command should report `arm64` for the Purple Pi OH2. The
+`hello-world` container confirms that the daemon can pull and run images.
+
+## Create the configuration directories
+
+```bash
+sudo mkdir -p /opt/homeassistant/config
+sudo mkdir -p /opt/homeassistant/localtime
+```
+
+Set ownership for your user instead of making the directory world-writable:
+
+```bash
+sudo chown -R $USER:$USER /opt/homeassistant
+sudo chmod -R 755 /opt/homeassistant
+```
+
+<Callout variant="warning" title="Do not use chmod 777">
+  The source guide used `chmod -R 777`. That lets every local user modify the
+  Home Assistant configuration. Use ownership and `755` permissions unless your
+  container setup specifically requires otherwise.
+</Callout>
+
+## Run the container
+
+```bash title="Start Home Assistant"
+docker run -d \
+  --name homeassistant \
+  --privileged \
+  --restart=unless-stopped \
+  -e TZ=Asia/Colombo \
+  -v /opt/homeassistant/config:/config \
+  -v /run/dbus:/run/dbus:ro \
+  --network=host \
+  ghcr.io/home-assistant/home-assistant:stable
+```
+
+Replace `Asia/Colombo` with your own timezone. Verify the container image name
+against the current Home Assistant documentation before relying on it for an
+unattended deployment.
+
+<Callout variant="caution" title="Privileged mode and host networking">
+  `--privileged` and `--network=host` give the container broad access to the host.
+  The source uses them for USB/Zigbee device access and local discovery. Review
+  the security implications and limit the container's access where possible.
+</Callout>
+
+## Access the dashboard
+
+Open a browser on the same network:
+
+```text
+http://<purple-pi-ip>:8123
+```
+
+<Figure
+  src="/images/purple-pi-oh2/applications/home-assistant-welcome.webp"
+  alt="Home Assistant first-run welcome screen"
+  caption="The first-run Home Assistant welcome screen. Complete the setup wizard with your own account."
+  width={1400}
+  height={672}
+/>
+
+After the setup wizard, the dashboard is available:
+
+<Figure
+  src="/images/purple-pi-oh2/applications/home-assistant-dashboard.webp"
+  alt="Home Assistant dashboard with device cards and controls"
+  caption="Home Assistant dashboard after setup."
+  width={1400}
+  height={672}
+/>
+
+## Manage the container
+
+| Task | Command |
+| --- | --- |
+| Stop | `docker stop homeassistant` |
+| Start | `docker start homeassistant` |
+| Restart | `docker restart homeassistant` |
+| Logs | `docker logs homeassistant` |
+| Remove container (keeps config) | `docker rm -f homeassistant` |
+| Pull the latest image | `docker pull ghcr.io/home-assistant/home-assistant:stable` |
+
+## Update Home Assistant
+
+```bash
+docker stop homeassistant
+docker rm homeassistant
+docker pull ghcr.io/home-assistant/home-assistant:stable
+```
+
+Then run the `docker run` command again with the same volumes. Back up
+`/opt/homeassistant/config` before updating.
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| Port 8123 does not respond | `docker ps` and `docker logs homeassistant` |
+| Container restarts repeatedly | Check configuration and logs; restore a backup if needed |
+| USB/Zigbee device not detected | Device permissions and the `--privileged` trade-off |
+| Setup wizard appears again | The `/config` volume may not be mapped to persistent storage |
+
+## Related pages
+
+- [Docker on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/docker/)
+- [Node-RED on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/node-red/)
+- [Purple Pi OH2 overview](/single-board-computers/purple-pi-oh2/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 Home Assistant guide. The permissions,
+timezone, and image name have been adjusted for clarity and safety; verify them
+against current Home Assistant documentation.

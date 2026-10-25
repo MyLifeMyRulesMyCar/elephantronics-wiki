@@ -1,0 +1,327 @@
+---
+title: Purple Pi OH2
+description: An overview of the Rockchip RK3576-based Purple Pi OH2 single-board computer, including specifications, ports, connectivity, GPIO, storage, camera, and audio.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import Callout from '../../../../components/Callout.astro';
+import Figure from '../../../../components/Figure.astro';
+import TechTags from '../../../../components/TechTags.astro';
+
+<TechTags tags={['Single Board Computer', 'Rockchip RK3576', '6 TOPS NPU']} />
+
+The **Purple Pi OH2** is an industrial-oriented single-board computer built around
+the Rockchip RK3576 octa-core SoC. It combines an ARM CPU, an NPU rated at 6 TOPS
+by the vendor, dual Gigabit Ethernet, M.2 NVMe storage, three MIPI CSI camera
+interfaces, and a Raspberry Pi-compatible 40-pin header.
+
+<Callout variant="warning" title="Draft documentation">
+  These pages are adapted from Elephantronics' Purple Pi OH2 documentation. The
+  procedures have **not** been independently verified for this wiki. Confirm the
+  board revision, OS image, and pinout before connecting hardware.
+</Callout>
+
+<Callout variant="note" title="Specifications are vendor-published">
+  The figures below come from the vendor documentation. They have not been
+  independently measured, and configurations vary by SKU. Confirm memory,
+  storage, and NPU specifications with the seller before designing around them.
+</Callout>
+
+## Quick start
+
+<Steps>
+1. Flash Debian, Ubuntu, or Buildroot to eMMC or a microSD card.
+2. Connect power through the DC 9–24 V barrel jack.
+3. Attach an HDMI display, keyboard, and mouse.
+4. SSH in or use the desktop. The source documentation lists `root` as the default user.
+5. Connect Ethernet; DHCP assigns an address automatically.
+</Steps>
+
+<Callout variant="caution" title="Change the default credentials">
+  A default `root` login is convenient for a first boot but unsafe on a network.
+  Set a strong password and create a non-root user before connecting the board to
+  an untrusted network.
+</Callout>
+
+## Main board overview
+
+<Figure
+  src="/images/purple-pi-oh2/overview/front.webp"
+  alt="Purple Pi OH2 front view with labelled Ethernet, USB, HDMI, GPIO, MIPI, RTC, and power connectors"
+  caption="Front view of the Purple Pi OH2. Image from Elephantronics' board documentation."
+  width={1107}
+  height={744}
+  variant="cover"
+  priority
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/overview/back.webp"
+  alt="Purple Pi OH2 back view with labelled recovery key, TF card slot, ADC header, and M.2 M-Key slot"
+  caption="Back view showing the recovery key, TF card slot, ADC header, and M.2 M-Key slot."
+  width={1209}
+  height={723}
+  variant="cover"
+/>
+
+## Technical specifications
+
+### Processor and memory
+
+| Item | Vendor-published specification |
+| --- | --- |
+| SoC | Rockchip RK3576 (8 nm) |
+| CPU | 4 × Cortex-A72 at 2.2 GHz + 4 × Cortex-A53 |
+| NPU | 6 TOPS neural processing unit |
+| RAM | Up to 16 GB LPDDR4 |
+
+### Storage
+
+| Item | Vendor-published specification |
+| --- | --- |
+| eMMC | Onboard eMMC 5.1, OS bootable |
+| microSD | TF card slot, SDIO 3.0 (J4) |
+| M.2 NVMe | M-Key 2280, PCIe 2.1 (J6) |
+
+### Display and camera
+
+| Item | Vendor-published specification |
+| --- | --- |
+| HDMI | HDMI 2.1, up to 8K at 60 fps (J14) |
+| DisplayPort | DP 1.4 over USB-C, up to 4K at 30 fps (J7) |
+| MIPI DSI | 40-pin FPC 0.5 mm connector (J15) |
+| MIPI CSI | 3 independent interfaces (J19, J20, J25) |
+
+### Connectivity
+
+| Item | Vendor-published specification |
+| --- | --- |
+| Ethernet | 2 × Gigabit RJ45 (eth0: J21, eth1: J22) |
+| Wi-Fi / Bluetooth | AP6256 module with antenna FPC |
+| USB 3.2 Gen1 | 1 × Type-C OTG with DP Alt Mode (J7) |
+| USB 3.0 | 2 × Type-A stacked (J10) |
+| USB 2.0 | 2 × PH2.0-4P headers (J8, J9) |
+
+### Expansion, audio, and other
+
+| Item | Vendor-published specification |
+| --- | --- |
+| 40-pin GPIO | 16 GPIOs, 3 × UART, 2 × I2C, 1 × SPI, 2 × CAN, 1 × ADC |
+| Audio codec | ES8388 |
+| Speaker | PH2.0-4P dual channel, 4 Ω 3 W per channel (J13) |
+| Headphone | 3.5 mm 4-pole CTIA jack (J12) |
+| Microphone | MX1.25T-2P connector (J11) |
+| Debug UART | USB-C with CH340, 1.5 Mbps (J5) |
+| RTC | CR1220 coin-cell holder (J23) |
+| Fan | PH2.0-2P 5 V fan header (J3) |
+
+### Power and operating system
+
+| Item | Vendor-published specification |
+| --- | --- |
+| Input voltage | DC 9–24 V through the barrel jack |
+| Supported OS | Debian, Ubuntu, Buildroot |
+
+## Connectivity
+
+### Ethernet
+
+The board has two native Gigabit Ethernet ports (`eth0` and `eth1`) with DHCP
+enabled by default.
+
+```bash title="Check and configure Ethernet"
+# Check the IP address assigned by DHCP
+ip addr show eth0
+
+# Set a static IP
+nmcli con mod "Wired connection 1" ipv4.addresses 192.168.1.100/24 \
+  ipv4.gateway 192.168.1.1 ipv4.dns "8.8.8.8" ipv4.method manual
+nmcli con up "Wired connection 1"
+```
+
+### Wi-Fi
+
+```bash title="Connect to Wi-Fi with nmcli"
+# Check interface status
+nmcli device
+
+# List available networks
+nmcli device wifi list
+
+# Connect to a network
+nmcli device wifi connect "YourSSID" password "YourPassword"
+
+# Confirm the connection
+nmcli connection show --active
+ip addr show wlan0
+```
+
+<Callout variant="note" title="Antenna required">
+  Connect the included Wi-Fi/Bluetooth antenna FPC to the AP6256 module. Wireless
+  range and stability are poor without it.
+</Callout>
+
+### Bluetooth
+
+```bash
+bluetoothctl power on
+bluetoothctl scan on
+bluetoothctl devices
+bluetoothctl trust XX:XX:XX:XX:XX:XX
+bluetoothctl pair XX:XX:XX:XX:XX:XX
+bluetoothctl connect XX:XX:XX:XX:XX:XX
+```
+
+## GPIO (40-pin header)
+
+<Figure
+  src="/images/purple-pi-oh2/overview/gpio-pinout.webp"
+  alt="Purple Pi OH2 40-pin GPIO header pinout with power, I2C, UART, SPI, ground, and GPIO pins"
+  caption="40-pin header pinout. The header is mechanically compatible with Raspberry Pi HATs, but the pin functions and device nodes are specific to this board."
+  width={1029}
+  height={1024}
+  variant="narrow"
+/>
+
+The header exposes 16 GPIOs plus UART, I2C, SPI, and CAN. **All GPIO logic is
+3.3 V.** Do not apply 5 V to a GPIO pin.
+
+```bash title="Install GPIO tools and toggle a pin"
+sudo apt update && sudo apt install -y libgpiod-dev gpiod
+
+# Pin 7 = GPIO2_B4 = gpiochip2 offset 12
+gpioset gpiochip2 12=1
+gpioset gpiochip2 12=0
+gpioget gpiochip2 12
+
+# Control multiple pins at once
+gpioset gpiochip2 12=1 13=0 14=1
+```
+
+### Key pin assignments
+
+| Pin | Function | Device node |
+| --- | --- | --- |
+| 3 / 5 | I2C4 SDA / SCL | `/dev/i2c-4` |
+| 8 / 10 | UART7 TX / RX | `/dev/ttyS7` |
+| 19, 21, 23, 24, 26 | SPI0 MOSI, MISO, CLK, CS0, CS1 | `/dev/spidev0.x` |
+| 27 / 28 | I2C7 SDA / SCL | `/dev/i2c-7` |
+| 37 | POWER_KEY | `/dev/input/event0` |
+
+The full pin map, digital I/O examples, I2C OLED guide, UART loopback test, and
+SPI notes are on the [GPIO and interfaces](/single-board-computers/purple-pi-oh2/gpio/)
+page.
+
+## Storage and expansion
+
+### M.2 NVMe SSD
+
+Install a 2280 NVMe drive in the M-Key slot (J6), then check that it is detected:
+
+```bash
+fdisk -l    # NVMe usually appears as /dev/nvme0n1
+lsblk       # Confirm the mount tree
+```
+
+### microSD card
+
+The TF slot (J4, back of the board) supports SDIO 3.0. After inserting a card:
+
+```bash
+lsblk       # microSD usually appears as /dev/mmcblk1
+```
+
+<Callout variant="note" title="Manual mount may be needed">
+  eMMC partition changes during boot can affect TF-card automounting. If the card
+  is detected but not mounted, mount it manually with
+  `mount /dev/mmcblk1p1 /mnt`.
+</Callout>
+
+### USB power control
+
+The two USB 3.0 Type-A ports can be switched in software:
+
+```bash
+echo 0 > /sys/class/leds/usb_pwr/brightness   # Power off
+echo 1 > /sys/class/leds/usb_pwr/brightness   # Power on
+```
+
+## Camera (MIPI CSI)
+
+Three independent MIPI CSI interfaces support simultaneous camera input.
+
+| Connector | Device node | Default sensor |
+| --- | --- | --- |
+| J19 | `/dev/video42` | OV13855 |
+| J20 | `/dev/video51` | OV13855 |
+| J25 | `/dev/video33` | Standard CSI |
+
+```bash title="Preview and capture from J19"
+# Live preview (requires a display)
+export DISPLAY=:0
+gst-launch-1.0 v4l2src device=/dev/video42 \
+  ! video/x-raw,format=NV12,width=1920,height=1080,framerate=30/1 \
+  ! videoconvert ! autovideosink sync=false
+
+# Capture one frame
+v4l2-ctl --verbose -d /dev/video42 \
+  --set-fmt-video=width=1920,height=1080,pixelformat='NV12' \
+  --stream-mmap=4 --stream-skip=3 \
+  --stream-to=./capture.yuv --stream-count=1 --stream-poll
+
+# Play the captured frame back
+ffplay -f rawvideo -video_size 1920x1080 -pixel_format nv12 ./capture.yuv
+```
+
+<Callout variant="note" title="J20 colour tint">
+  J20 may show a green tint depending on the sensor module. Apply a colour
+  correction filter in the GStreamer pipeline if needed.
+</Callout>
+
+## Audio
+
+The ES8388 codec handles speaker, headphone, and microphone I/O.
+
+```bash title="Audio output and capture"
+# Enable speaker / headphone output
+amixer -c 0 cset name='Speaker Switch' on
+
+# Play a WAV file
+aplay -D hw:0,0 audio.wav
+
+# Record from the headphone microphone (J12)
+amixer -c 0 cset numid=67 off
+echo -n "mic1" > /sys/class/es8388_mic/mic_channel
+arecord -D hw:0,0 -f S16_LE -r 16000 -c 2 recording.wav
+
+# Capture volume (0–192)
+amixer -c 0 cset numid=50 100
+
+# Automatic Level Control (stereo)
+amixer -c 0 cset numid=41 3
+```
+
+## Troubleshooting
+
+| Issue | Likely cause | Fix |
+| --- | --- | --- |
+| No display on HDMI | Cable or resolution mismatch | Try another cable; check the OS display settings |
+| Wi-Fi weak or disconnecting | Antenna not connected | Attach the antenna FPC to the AP6256 connector |
+| microSD not automounted | eMMC partition change on boot | Mount manually: `mount /dev/mmcblk1p1 /mnt` |
+| NVMe not detected | Drive not fully seated | Re-seat the M.2 drive and tighten the screw |
+| Camera shows green tint | Sensor colour calibration on J20 | Correct colour in the GStreamer pipeline |
+| No audio output | Speaker switch disabled | Run `amixer -c 0 cset name='Speaker Switch' on` |
+| USB device not recognised | USB power is off | Run `echo 1 > /sys/class/leds/usb_pwr/brightness` |
+
+## Explore the board
+
+- [GPIO and interfaces](/single-board-computers/purple-pi-oh2/gpio/) — GPIO, I2C OLED, UART, and SPI.
+- [Applications](/single-board-computers/purple-pi-oh2/applications/) — Docker, Node-RED, OpenCV, ROS 2, and Home Assistant.
+- [Industrial protocols](/single-board-computers/purple-pi-oh2/industrial-protocols/) — Modbus RTU, MQTT, and CAN bus.
+- [NPU and AI](/single-board-computers/purple-pi-oh2/npu/) — verify the NPU and run YOLOv5.
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 board documentation. The board
+photographs and connector labels are from the same source. Specifications and
+procedures have not been independently verified for this wiki.

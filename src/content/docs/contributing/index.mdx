@@ -164,19 +164,21 @@ missing from navigation, the sidebar entry is the usual cause.
 
 The tutorial example is
 [`dht22-arduino-uno-oled.mdx`](https://github.com/MyLifeMyRulesMyCar/elephantronics-wiki/blob/main/src/content/docs/microcontrollers/dht22-arduino-uno-oled.mdx).
-It demonstrates the shared documentation components:
+The wiki uses these shared documentation components:
 
 - `TutorialHeader` — difficulty, time, prerequisites, and verification status.
 - `ComponentCard` — component name, summary, and optional shop link.
 - `WiringTable` — accessible pin-to-pin connection tables.
-- `Callout` — note, tip, and warning boxes.
-- `Figure` — image or animated WebP with alt text, caption, and dimensions.
+- `Callout` - note, tip, and warning boxes.
+- `Figure` - image or animated WebP with alt text, caption, and dimensions.
+- `TechTags` - topic pills used at the top of board and guide pages.
 
 From a page two folders deep, import them like this:
 
 ```mdx
 import Callout from '../../../components/Callout.astro';
 import Figure from '../../../components/Figure.astro';
+import TechTags from '../../../components/TechTags.astro';
 import TutorialHeader from '../../../components/TutorialHeader.astro';
 ```
 

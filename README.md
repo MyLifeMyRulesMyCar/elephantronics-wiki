@@ -73,10 +73,26 @@ src/content/docs/
 ├─ circuit-design/index.md                Pre-power checklist
 ├─ single-board-computers/
 │  ├─ index.md                            SBC overview
-│  └─ muse-pro-pi/
-│     ├─ index.mdx                        Introduction and first boot
-│     ├─ benchmark-deep-dive.mdx          Benchmark results
-│     └─ object-detection.mdx             YOLOv8 object detection
+│  ├─ muse-pro-pi/
+│  │  ├─ index.mdx                        Introduction and first boot
+│  │  ├─ benchmark-deep-dive.mdx          Benchmark results
+│  │  └─ object-detection.mdx             YOLOv8 object detection
+│  └─ purple-pi-oh2/
+│     ├─ index.mdx                        Overview and quick start
+│     ├─ gpio.mdx                         GPIO, I2C, UART, SPI
+│     ├─ applications/
+│     │  ├─ index.mdx                     Application guides
+│     │  ├─ docker.mdx
+│     │  ├─ node-red.mdx
+│     │  ├─ opencv.mdx
+│     │  ├─ ros2.mdx
+│     │  └─ home-assistant.mdx
+│     ├─ industrial-protocols/
+│     │  ├─ index.mdx                     Protocol guides
+│     │  ├─ modbus.mdx
+│     │  ├─ mqtt.mdx
+│     │  └─ can-bus.mdx
+│     └─ npu.mdx                          NPU and YOLOv5
 ├─ robotics/index.md                      Scope and roadmap
 ├─ troubleshooting/index.md               First-checks routine
 └─ contributing/index.mdx                 Contributor guide
@@ -120,6 +136,7 @@ import ComponentCard from '../../../components/ComponentCard.astro';
 import WiringTable from '../../../components/WiringTable.astro';
 import Callout from '../../../components/Callout.astro';
 import Figure from '../../../components/Figure.astro';
+import TechTags from '../../../components/TechTags.astro';
 ```
 
 Adjust the depth of `../` if the page lives at a different level under
@@ -130,9 +147,10 @@ Adjust the depth of `../` if the page lives at a different level under
 - `ComponentCard` — component name, summary, optional part number, and shop link.
 - `WiringTable` — accessible pin-to-pin connections with a caption and note.
 - `Callout` — `note`, `tip`, or `warning`, wrapped around Starlight's `Aside`.
-- `Figure` — responsive image or animated WebP with alt text, caption, dimensions,
+- `Figure` - responsive image or animated WebP with alt text, caption, dimensions,
   and a white card backing for charts.
-- `FeaturedCard` — homepage feature card with cover image, tag, and summary.
+- `TechTags` - topic pills used at the top of board and guide pages.
+- `FeaturedCard` - homepage feature card with cover image, tag, and summary.
 
 Prefer Starlight's built-in components (`CardGrid`, `LinkCard`, `Steps`, `Tabs`,
 `Aside`) when they already do the job. Code blocks use Starlight's native
@@ -148,6 +166,12 @@ public/images/
 ├─ muse-pro-pi/
 │  ├─ benchmark/
 │  └─ object-detection/
+├─ purple-pi-oh2/
+│  ├─ overview/
+│  ├─ gpio/
+│  ├─ applications/
+│  ├─ industrial/
+│  └─ npu/
 └─ ...
 ```
 

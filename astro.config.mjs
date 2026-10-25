@@ -89,6 +89,75 @@ export default defineConfig({
                 },
               ],
             },
+            {
+              label: 'Purple Pi OH2',
+              items: [
+                {
+                  label: 'Overview',
+                  slug: 'single-board-computers/purple-pi-oh2',
+                },
+                {
+                  label: 'GPIO & interfaces',
+                  slug: 'single-board-computers/purple-pi-oh2/gpio',
+                },
+                {
+                  label: 'Applications',
+                  collapsed: true,
+                  items: [
+                    {
+                      label: 'Overview',
+                      slug: 'single-board-computers/purple-pi-oh2/applications',
+                    },
+                    {
+                      label: 'Docker',
+                      slug: 'single-board-computers/purple-pi-oh2/applications/docker',
+                    },
+                    {
+                      label: 'Node-RED',
+                      slug: 'single-board-computers/purple-pi-oh2/applications/node-red',
+                    },
+                    {
+                      label: 'OpenCV',
+                      slug: 'single-board-computers/purple-pi-oh2/applications/opencv',
+                    },
+                    {
+                      label: 'ROS 2',
+                      slug: 'single-board-computers/purple-pi-oh2/applications/ros2',
+                    },
+                    {
+                      label: 'Home Assistant',
+                      slug: 'single-board-computers/purple-pi-oh2/applications/home-assistant',
+                    },
+                  ],
+                },
+                {
+                  label: 'Industrial protocols',
+                  collapsed: true,
+                  items: [
+                    {
+                      label: 'Overview',
+                      slug: 'single-board-computers/purple-pi-oh2/industrial-protocols',
+                    },
+                    {
+                      label: 'Modbus RTU',
+                      slug: 'single-board-computers/purple-pi-oh2/industrial-protocols/modbus',
+                    },
+                    {
+                      label: 'MQTT',
+                      slug: 'single-board-computers/purple-pi-oh2/industrial-protocols/mqtt',
+                    },
+                    {
+                      label: 'CAN bus',
+                      slug: 'single-board-computers/purple-pi-oh2/industrial-protocols/can-bus',
+                    },
+                  ],
+                },
+                {
+                  label: 'NPU & AI',
+                  slug: 'single-board-computers/purple-pi-oh2/npu',
+                },
+              ],
+            },
           ],
         },
         {

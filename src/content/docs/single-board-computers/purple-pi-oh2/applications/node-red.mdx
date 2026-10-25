@@ -1,0 +1,131 @@
+---
+title: Node-RED on the Purple Pi OH2
+description: Install Node-RED on the Purple Pi OH2 with the official installer, configure the prompts, and open the browser editor.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['Node-RED', 'Node.js', 'IoT', 'Flows']} />
+
+<TutorialHeader
+  difficulty="Beginner"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'Network access for the installer and npm packages',
+    'A terminal session on the board',
+  ]}
+  note="The all-in-one installer changes Node.js and system packages. Read the prompts before accepting defaults."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/applications/node-red-banner.webp"
+  alt="Node-RED flow-based programming interface"
+  caption="Node-RED provides a browser-based editor for connecting devices, APIs, and services."
+  width={1200}
+  height={670}
+  variant="cover"
+/>
+
+Node-RED is a flow-based development tool for visual programming. On the Purple
+Pi OH2 it can connect GPIO, network services, MQTT brokers, and HTTP APIs without
+writing a full application for every experiment.
+
+## Install Node-RED
+
+The Node-RED project provides an official installer script that installs Node.js,
+Node-RED, and the required dependencies:
+
+```bash title="Run the official installer"
+bash <(curl -sL https://raw.githubusercontent.com/node-red/linux-installers/master/deb/update-nodejs-and-nodered)
+```
+
+The download and installation can take several minutes.
+
+<Figure
+  src="/images/purple-pi-oh2/applications/node-red-install.webp"
+  alt="Terminal output from the Node-RED installation script"
+  caption="The installer downloads Node.js and Node-RED and then asks a series of configuration questions."
+  width={841}
+  height={527}
+/>
+
+## Installation prompts
+
+The source guide recommends these answers:
+
+| Prompt | Recommended answer |
+| --- | --- |
+| Node-RED settings file | Press `Enter` for the default |
+| Share anonymous usage information | `No` |
+| User security | `No` for a local test; enable it before exposing the editor |
+| Projects feature | `No` |
+| Flow file | `flows.json` |
+| Encrypt credentials file | Press `Enter` to skip |
+| Editor theme/style | Default |
+| Text editor component | `Monaco` |
+| Allow external modules in function nodes | `Yes` |
+
+<Callout variant="warning" title="Do not expose an unauthenticated editor">
+  Choosing “No” for user security leaves the editor open to anyone who can reach
+  port 1880. Enable authentication, or bind the service to localhost and use an
+  SSH tunnel, before exposing the board to a network.
+</Callout>
+
+## Control Node-RED
+
+| Task | Command |
+| --- | --- |
+| Start | `node-red-start` |
+| Stop | `node-red-stop` |
+| Restart | `node-red-restart` |
+| View logs | `node-red-log` |
+| Enable at boot | `sudo systemctl enable nodered.service` |
+| Disable at boot | `sudo systemctl disable nodered.service` |
+
+## Open the editor
+
+On the board itself:
+
+```text
+http://localhost:1880
+```
+
+From another computer on the same network:
+
+```text
+http://<purple-pi-ip-address>:1880
+```
+
+Replace `<purple-pi-ip-address>` with the board's address, for example
+`192.168.1.100`.
+
+<Figure
+  src="/images/purple-pi-oh2/applications/node-red-editor.webp"
+  alt="Node-RED editor with a flow canvas, palette, and sidebar"
+  caption="The Node-RED editor after installation."
+  width={1400}
+  height={672}
+/>
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `node-red-start` not found | The installer did not finish; rerun it and read the output |
+| Editor unreachable | Check `node-red-log`, the board IP, and whether port 1880 is listening |
+| Node.js version error | Re-run the official installer so Node.js and Node-RED match |
+| Flow lost after reboot | Confirm the flow file path and that `nodered.service` is enabled |
+
+## Related pages
+
+- [Docker on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/docker/)
+- [MQTT on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/industrial-protocols/mqtt/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 Node-RED guide. The procedure has not
+been independently verified for this wiki.

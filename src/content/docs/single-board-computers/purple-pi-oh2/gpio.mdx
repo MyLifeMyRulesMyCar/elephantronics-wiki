@@ -1,0 +1,888 @@
+---
+title: GPIO and interfaces
+description: Use the Purple Pi OH2 40-pin header for GPIO, an I2C OLED, UART, and SPI. Includes pin maps, Python examples, and device-permission notes.
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Figure from '../../../../components/Figure.astro';
+import TechTags from '../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['GPIO', 'I2C', 'UART', 'SPI', 'Python']} />
+
+<TutorialHeader
+  difficulty="Intermediate"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'SSH or local terminal access',
+    'A breadboard, jumper wires, an LED, and a 220 Ω resistor for the GPIO example',
+    'An SSD1306 I2C OLED module for the display example',
+  ]}
+  note="Pin mappings, device nodes, and scripts follow Elephantronics' Purple Pi OH2 documentation. Verify them against your board revision before powering a circuit."
+/>
+
+The 40-pin header exposes GPIO, I2C, UART, SPI, CAN, and power. This page covers
+the pin map, digital input and output, an I2C OLED, a UART loopback test, and the
+SPI bus. The CAN controller example is on the
+[CAN bus page](/single-board-computers/purple-pi-oh2/industrial-protocols/can-bus/).
+
+<Callout variant="warning" title="3.3 V logic">
+  All GPIO and interface signals are 3.3 V. Do not apply 5 V to a GPIO pin, and
+  check the voltage requirements of every module before connecting it.
+</Callout>
+
+## Connect via SSH (VS Code)
+
+1. Install the **Remote - SSH** extension in VS Code.
+2. Add the board's IP address and username as an SSH host.
+3. Connect and open a terminal on the board.
+
+The source documentation uses `root` as the default login. Change the password
+and create a normal user before exposing the board to a network.
+
+## GPIO map
+
+<Figure
+  src="/images/purple-pi-oh2/overview/gpio-pinout.webp"
+  alt="Purple Pi OH2 40-pin header pinout with power, I2C, UART, SPI, ground, and GPIO assignments"
+  caption="Purple Pi OH2 40-pin header. The header is mechanically Raspberry Pi HAT-compatible, but the pin functions and Linux device nodes are board-specific."
+  width={1029}
+  height={1024}
+  variant="narrow"
+/>
+
+| Pin | Function | Description | Voltage / type | Device node / notes |
+| --- | --- | --- | --- | --- |
+| 1 | 3.3V | Power output | 3.3 V DC | Power output |
+| 2 | 5V | Power output | 5 V DC | Power output |
+| 3 | I2C4_SDA | I2C4 data | 3.3 V logic | `/dev/i2c-4` |
+| 4 | 5V | Power output | 5 V DC | Power output |
+| 5 | I2C4_SCL | I2C4 clock | 3.3 V logic | `/dev/i2c-4` |
+| 6 | GND | Ground | 0 V | Reference ground |
+| 7 | GPIO76 | GPIO2_B4 | 3.3 V logic | `gpiochip2` offset 12 |
+| 8 | UART7_TX | UART7 transmit | TTL 3.3 V | `/dev/ttyS7` |
+| 9 | GND | Ground | 0 V | Reference ground |
+| 10 | UART7_RX | UART7 receive | TTL 3.3 V | `/dev/ttyS7` |
+| 11 | GPIO75 | GPIO2_B3 | 3.3 V logic | `gpiochip2` offset 11 |
+| 12 | GPIO77 | GPIO2_B5 | 3.3 V logic | `gpiochip2` offset 13 |
+| 13 | GPIO72 | GPIO2_B0 | 3.3 V logic | `gpiochip2` offset 8 |
+| 14 | GND | Ground | 0 V | Reference ground |
+| 15 | GPIO73 | GPIO2_B1 | 3.3 V logic | `gpiochip2` offset 9 |
+| 16 | GPIO74 | GPIO2_B2 | 3.3 V logic | `gpiochip2` offset 10 |
+| 17 | 3.3V | Power output | 3.3 V DC | Power output |
+| 18 | GPIO136 | GPIO4_B0 | 3.3 V logic | `gpiochip4` offset 8 |
+| 19 | SPI0_MOSI | SPI master out | 3.3 V logic | `/dev/spidev0.0` |
+| 20 | GND | Ground | 0 V | Reference ground |
+| 21 | SPI0_MISO | SPI master in | 3.3 V logic | `/dev/spidev0.0` |
+| 22 | GPIO137 | GPIO4_B1 | 3.3 V logic | `gpiochip4` offset 9 |
+| 23 | SPI0_SCLK | SPI clock | 3.3 V logic | `/dev/spidev0.0` |
+| 24 | SPI0_CS0 | SPI chip select 0 | 3.3 V logic | `/dev/spidev0.0` |
+| 25 | GND | Ground | 0 V | Reference ground |
+| 26 | SPI0_CS1 | SPI chip select 1 | 3.3 V logic | `/dev/spidev0.1` |
+| 27 | I2C7_SDA | I2C7 data | 3.3 V logic | `/dev/i2c-7` |
+| 28 | I2C7_SCL | I2C7 clock | 3.3 V logic | `/dev/i2c-7` |
+| 29 | GPIO56 | GPIO1_D0 | 3.3 V logic | `gpiochip1` offset 24 |
+| 30 | GND | Ground | 0 V | Reference ground |
+| 31 | GPIO57 | GPIO1_D1 | 3.3 V logic | `gpiochip1` offset 25 |
+| 32 | GPIO132 | GPIO4_A4 | 3.3 V logic | `gpiochip4` offset 4 |
+| 33 | GPIO58 | GPIO1_D2 | 3.3 V logic | `gpiochip1` offset 26 |
+| 34 | GND | Ground | 0 V | Reference ground |
+| 35 | GPIO59 | GPIO1_D3 | 3.3 V logic | `gpiochip1` offset 27 |
+| 36 | GPIO134 | GPIO4_A6 | 3.3 V logic | `gpiochip4` offset 6 |
+| 37 | POWER_KEY | Power-key input | 3.3 V logic | `/dev/input/event0` |
+| 38 | GPIO98 | GPIO3_A2 | 3.3 V logic | `gpiochip3` offset 2 |
+| 39 | GND | Ground | 0 V | Reference ground |
+| 40 | GPIO99 | GPIO3_A3 | 3.3 V logic | `gpiochip3` offset 3 |
+
+## Project setup
+
+The source examples use a Python virtual environment. Create a project directory
+and install the GPIO tools:
+
+```bash title="Create the project environment"
+mkdir my_project && cd my_project
+
+sudo apt update
+sudo apt install python3-venv python3-libgpiod libgpiod-dev gpiod -y
+
+python3 -m venv venv
+source venv/bin/activate
+```
+
+## Digital output
+
+### Hardware wiring
+
+<Figure
+  src="/images/purple-pi-oh2/gpio/digital-output.webp"
+  alt="LED connected to Purple Pi OH2 header pin 40 through a 220 ohm resistor, with the cathode to ground on pin 39"
+  caption="Example LED circuit: pin 40 (GPIO3_A3) → 220 Ω resistor → LED anode; LED cathode → pin 39 (GND)."
+  width={1200}
+  height={799}
+/>
+
+| Connection | Point |
+| --- | --- |
+| Pin 40 | GPIO3_A3, `gpiochip3` offset 3 |
+| Pin 39 | Ground |
+| Resistor | 220 Ω in series with the LED |
+| LED polarity | Anode to the resistor, cathode to ground |
+
+<Callout variant="caution" title="Check the LED polarity">
+  A reversed LED will not light. The longer leg is normally the anode. If the LED
+  is backwards, disconnect power before changing the wiring.
+</Callout>
+
+### Install gpiod
+
+```bash title="Install the Python gpiod binding"
+pip install gpiod
+```
+
+### Set GPIO permissions
+
+```bash title="Temporary device permissions"
+sudo chmod 666 /dev/gpiochip*
+```
+
+<Callout variant="warning" title="World-writable device nodes">
+  `chmod 666` is a quick development shortcut, is reset by a reboot, and lets any
+  local user control the GPIO lines. For a permanent setup, use a udev rule or a
+  dedicated group instead of leaving the device world-writable.
+</Callout>
+
+### LED control scripts
+
+Create `led_controller.py` for a single on/off action:
+
+```python title="led_controller.py"
+#!/usr/bin/env python3
+"""
+Simple LED On/Off for Purple Pi OH2
+Using /dev/gpiochip3, line 3
+"""
+
+import gpiod
+import time
+from gpiod.line import Direction, Value
+
+# Your specific GPIO pin
+CHIP = '/dev/gpiochip3'
+LINE = 3
+
+def led_on():
+    """Turn LED on"""
+    with gpiod.request_lines(
+        CHIP,
+        consumer="led_control",
+        config={
+            LINE: gpiod.LineSettings(
+                direction=Direction.OUTPUT,
+                output_value=Value.ACTIVE,
+            )
+        },
+    ) as request:
+        request.set_value(LINE, Value.ACTIVE)
+        print("LED is ON")
+
+def led_off():
+    """Turn LED off"""
+    with gpiod.request_lines(
+        CHIP,
+        consumer="led_control",
+        config={
+            LINE: gpiod.LineSettings(
+                direction=Direction.OUTPUT,
+                output_value=Value.INACTIVE,
+            )
+        },
+    ) as request:
+        request.set_value(LINE, Value.INACTIVE)
+        print("LED is OFF")
+
+def main():
+    print("Simple LED Controller - GPIO3 Line 3\n")
+
+    # Turn LED on
+    led_on()
+
+    # Wait 2 seconds
+    time.sleep(2)
+
+    # Turn LED off
+    led_off()
+
+if __name__ == "__main__":
+    main()
+```
+
+Create `blink.py` for continuous blinking:
+
+```python title="blink.py"
+#!/usr/bin/env python3
+"""
+Continuous LED Blinking for Purple Pi OH2
+Using /dev/gpiochip3, line 3
+Press Ctrl+C to stop
+"""
+
+import gpiod
+import time
+import signal
+import sys
+from gpiod.line import Direction, Value
+
+# Your specific GPIO pin
+CHIP = '/dev/gpiochip3'
+LINE = 3
+
+# Global variable to control blinking
+blinking = True
+
+def signal_handler(sig, frame):
+    """Handle Ctrl+C gracefully"""
+    global blinking
+    print("\n\nStopping blinking...")
+    blinking = False
+    # Turn LED off before exiting
+    try:
+        with gpiod.request_lines(
+            CHIP,
+            consumer="led_control",
+            config={
+                LINE: gpiod.LineSettings(
+                    direction=Direction.OUTPUT,
+                    output_value=Value.INACTIVE,
+                )
+            },
+        ) as request:
+            request.set_value(LINE, Value.INACTIVE)
+            print("LED turned off")
+    except:
+        pass
+    sys.exit(0)
+
+def continuous_blink(interval=0.5):
+    """Blink LED continuously until Ctrl+C is pressed"""
+    global blinking
+
+    # Register signal handler for Ctrl+C
+    signal.signal(signal.SIGINT, signal_handler)
+
+    print("Continuous Blinking Mode - GPIO3 Line 3")
+    print("Press Ctrl+C to stop\n")
+
+    try:
+        with gpiod.request_lines(
+            CHIP,
+            consumer="led_blink",
+            config={
+                LINE: gpiod.LineSettings(
+                    direction=Direction.OUTPUT,
+                    output_value=Value.INACTIVE,
+                )
+            },
+        ) as request:
+
+            while blinking:
+                # LED ON
+                request.set_value(LINE, Value.ACTIVE)
+                print("LED ON")
+                time.sleep(interval)
+
+                # LED OFF
+                request.set_value(LINE, Value.INACTIVE)
+                print("LED OFF")
+                time.sleep(interval)
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+def main():
+    # Start continuous blinking with 0.5 second intervals
+    continuous_blink(interval=0.5)
+
+    # Keep the program running
+    while True:
+        time.sleep(0.1)
+
+if __name__ == "__main__":
+    main()
+```
+
+### Run the script
+
+```bash
+python3 led_controller.py
+python3 blink.py
+```
+
+Press `Ctrl+C` to stop the blinking script.
+
+### Manual GPIO testing (no Python)
+
+```bash title="gpioset and gpioget"
+gpioinfo                    # List all chips and offsets
+gpioset gpiochip3 3=1       # Pin 40 HIGH → LED on
+gpioset gpiochip3 3=0       # Pin 40 LOW  → LED off
+gpioget gpiochip3 3         # Read current state
+```
+
+## Digital input
+
+The input example monitors `gpiochip2` line 12, which is header pin 7. Connect the
+pin to 3.3 V or ground through a suitable switch or jumper. The script enables a
+pull-down bias and reports state changes.
+
+### Input monitor script
+
+Create `input_monitor.py`:
+
+```python title="input_monitor.py"
+#!/usr/bin/env python3
+"""
+Simple GPIO Input with State Change Detection for Purple Pi OH2
+Using /dev/gpiochip2, line 12
+Press Ctrl+C to stop
+"""
+
+import gpiod
+import time
+from gpiod.line import Direction, Value, Bias, Edge
+
+# Your specific GPIO input pin
+CHIP = '/dev/gpiochip2'
+LINE = 12
+
+def detect_state_changes():
+    """Detect and report state changes on GPIO input"""
+    print(f"Monitoring GPIO input on {CHIP}, line {LINE}")
+    print("Press Ctrl+C to stop\n")
+
+    # Configure the GPIO line as input with pull-down
+    config = {
+        LINE: gpiod.LineSettings(
+            direction=Direction.INPUT,
+            bias=Bias.PULL_DOWN,  # Pull-down: LOW when nothing connected
+            edge_detection=Edge.BOTH,  # Detect both rising and falling edges
+        )
+    }
+
+    try:
+        with gpiod.request_lines(
+            CHIP,
+            consumer="input_monitor",
+            config=config,
+        ) as request:
+
+            previous_state = None
+
+            while True:
+                # Read current value
+                current_value = request.get_value(LINE)
+
+                # Check for state change
+                if previous_state is not None and current_value != previous_state:
+                    if current_value == Value.ACTIVE:
+                        print("🔘 HIGH (Button PRESSED or signal HIGH)")
+                    else:
+                        print("🔘 LOW (Button RELEASED or signal LOW)")
+
+                previous_state = current_value
+
+                # Small delay to prevent CPU overuse
+                time.sleep(0.01)
+
+    except KeyboardInterrupt:
+        print("\n\nMonitoring stopped")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def main():
+    print("=" * 50)
+    print("GPIO Input State Change Detector")
+    print("=" * 50)
+    detect_state_changes()
+
+if __name__ == "__main__":
+    main()
+```
+
+### Run the script
+
+```bash
+python3 input_monitor.py
+```
+
+## I2C OLED (SSD1306)
+
+<Callout variant="warning" title="Disconnect power before wiring">
+  Remove power before connecting the OLED. Check that the module is a 3.3 V
+  compatible SSD1306 board and that its pin order matches the table below.
+</Callout>
+
+### Overview
+
+This example talks to a 128 × 64 SSD1306 OLED directly over I2C using the
+`python-periphery` library. It covers bus detection, a basic display test, and
+bitmap rendering.
+
+### Wiring
+
+| OLED pin | Purple Pi OH2 |
+| --- | --- |
+| VCC | 3.3 V (pin 1 or 17) |
+| GND | GND (pin 6, 9, 14, 20, 25, 30, 34, or 39) |
+| SDA | Pin 3 (I2C4 SDA) |
+| SCL | Pin 5 (I2C4 SCL) |
+
+| Item | Value |
+| --- | --- |
+| I2C bus | `/dev/i2c-4` |
+| Typical address | `0x3C` |
+| Display | SSD1306, 128 × 64 |
+
+### Detect the I2C bus
+
+```bash
+ls /dev/i2c-*
+```
+
+The source documentation shows buses from `/dev/i2c-0` through `/dev/i2c-7`.
+Use `/dev/i2c-4` for the header pins above.
+
+### Scan for I2C devices
+
+```bash title="Scan I2C bus 4"
+sudo i2cdetect -y 4
+```
+
+A device at `0x3C` is the common SSD1306 address. Some modules use `0x3D`.
+
+### Install the required packages
+
+```bash title="Install I2C and image tools"
+sudo apt update
+sudo apt install i2c-tools -y
+pip install python-periphery pillow
+```
+
+### Set I2C permissions
+
+```bash title="Temporary I2C permissions"
+sudo chmod 666 /dev/i2c-4
+```
+
+The same warning applies: this is a temporary development shortcut. Prefer a
+group or udev rule for a permanent installation.
+
+### Basic I2C test
+
+Create `i2c_test.py`:
+
+```python title="i2c_test.py"
+from periphery import I2C
+import time
+
+# Purple Pi OH2 Configuration
+I2C_BUS = "/dev/i2c-4"  # Confirmed by your i2cdetect output
+I2C_ADDR = 0x3C         # Confirmed by your scan
+
+def main():
+    try:
+        # Open I2C connection
+        i2c = I2C(I2C_BUS)
+        print(f"Connected to {I2C_BUS}, device at {hex(I2C_ADDR)}")
+
+        # SSD1306 Initialization Sequence
+        init_sequence = [
+            0xAE,  # Display off
+            0x00, 0x10, 0x40, 0xB0, 0x81, 0xCF, 0xA1, 0xA6,
+            0xA8, 0x3F, 0xC8, 0xD3, 0x00, 0xD5, 0x80, 0xD9,
+            0xF1, 0xDA, 0x12, 0xDB, 0x40, 0x8D, 0x14, 0xAF  # Display on
+        ]
+
+        # Send initialization commands
+        for cmd in init_sequence:
+            i2c.transfer(I2C_ADDR, [I2C.Message([0x00, cmd])])
+        time.sleep(0.1)
+
+        # Clear display function
+        def clear_display():
+            for page in range(8):
+                # Set page address
+                i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0xB0 + page])])
+                # Set column address
+                i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0x00])])
+                i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0x10])])
+                # Write zeros to all columns
+                for _ in range(128):
+                    i2c.transfer(I2C_ADDR, [I2C.Message([0x40, 0x00])])
+
+        clear_display()
+
+        # Simple 5x7 font
+        font = {
+            'H': [0x7F, 0x08, 0x08, 0x08, 0x7F],
+            'e': [0x38, 0x54, 0x54, 0x54, 0x18],
+            'l': [0x00, 0x41, 0x7F, 0x40, 0x00],
+            'o': [0x38, 0x44, 0x44, 0x44, 0x38],
+            ' ': [0x00, 0x00, 0x00, 0x00, 0x00],
+        }
+
+        text = "Hello"
+
+        # Position at page 1
+        i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0xB1])])
+        # Set column to 0
+        i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0x00])])
+        i2c.transfer(I2C_ADDR, [I2C.Message([0x00, 0x10])])
+
+        # Write each character
+        for char in text:
+            char_data = font.get(char, [0x00]*5)
+            for col in char_data:
+                i2c.transfer(I2C_ADDR, [I2C.Message([0x40, col])])
+            # Space between characters
+            i2c.transfer(I2C_ADDR, [I2C.Message([0x40, 0x00])])
+
+        print("Text sent successfully!")
+        i2c.close()
+
+    except Exception as e:
+        print(f"Error: {e}")
+        print("\nTroubleshooting:")
+        print("1. Make sure you're using sudo: sudo python3 i2c_test.py")
+        print("2. Check wiring: SDA=Pin3, SCL=Pin5, VCC=Pin1(3.3V), GND=Pin9")
+
+if __name__ == "__main__":
+    main()
+```
+
+### Run the test
+
+```bash
+python3 i2c_test.py
+```
+
+Expected output begins with:
+
+```text
+Connected to /dev/i2c-4, device at 0x3c
+Text sent successfully!
+```
+
+### Display a bitmap
+
+The source workflow converts an image to a 128 × 64 monochrome buffer and sends
+it to the OLED.
+
+#### Generate the bitmap
+
+Save this as `converter.py`. Replace `elephant.png` with your own image;
+the script resizes it to 128 × 48, leaving space for two lines of text.
+
+```python title="converter.py"
+from PIL import Image
+
+# Load image - replace with yours
+img = Image.open("elephant.png").convert("L")
+
+# Resize smaller (leave space for text)
+img = img.resize((128, 48))
+
+# Convert to black/white
+img = img.point(lambda x: 0 if x < 128 else 255, '1')
+
+# Create empty OLED buffer
+buffer = [0x00] * (128 * 8)
+
+pixels = img.load()
+
+# Center vertically (top area)
+y_offset = 0   # top aligned (can change to center if you want)
+
+for x in range(128):
+    for y in range(48):
+        if pixels[x, y] == 0:
+            oled_y = y + y_offset
+            page = oled_y // 8
+            index = x + (page * 128)
+            buffer[index] |= (1 << (oled_y % 8))
+
+# Save buffer
+with open("elephant_bitmap.py", "w") as f:
+    f.write("elephant_bitmap = [\n")
+    for i in range(0, len(buffer), 16):
+        line = ", ".join(f"0x{b:02X}" for b in buffer[i:i+16])
+        f.write(f"    {line},\n")
+    f.write("]\n")
+
+print("Smaller elephant bitmap generated!")
+```
+
+Run it:
+
+```bash
+python3 converter.py
+```
+
+This creates `elephant_bitmap.py`, which exposes an `elephant_bitmap` list.
+
+#### Create the display script
+
+Create `oled_image.py`:
+
+```python title="oled_image.py"
+from periphery import I2C
+from elephant_bitmap import elephant_bitmap
+
+I2C_BUS = "/dev/i2c-4"
+I2C_ADDR = 0x3C
+
+i2c = I2C(I2C_BUS)
+
+def send_cmd(cmd):
+    i2c.transfer(I2C_ADDR, [I2C.Message([0x00, cmd])])
+
+def send_data(data):
+    i2c.transfer(I2C_ADDR, [I2C.Message([0x40] + data)])
+
+# -------- INIT --------
+def init_display():
+    cmds = [
+        0xAE, 0x20, 0x00, 0xB0, 0xC8, 0x00, 0x10,
+        0x40, 0x81, 0xFF, 0xA1, 0xA6, 0xA8, 0x3F,
+        0xA4, 0xD3, 0x00, 0xD5, 0xF0, 0xD9, 0x22,
+        0xDA, 0x12, 0xDB, 0x20, 0x8D, 0x14, 0xAF
+    ]
+    for c in cmds:
+        send_cmd(c)
+
+# -------- TEXT DRAW --------
+def draw_centered_text_on_buffer(buffer, text):
+    font = {
+        'E':[0x7F,0x49,0x49,0x49,0x41],
+        'l':[0x00,0x41,0x7F,0x40,0x00],
+        'e':[0x38,0x54,0x54,0x54,0x18],
+        'p':[0x7C,0x14,0x14,0x14,0x08],
+        'h':[0x7F,0x08,0x08,0x08,0x70],
+        'a':[0x20,0x54,0x54,0x54,0x78],
+        'n':[0x7C,0x08,0x04,0x04,0x78],
+        't':[0x04,0x3F,0x44,0x40,0x20],
+        'r':[0x7C,0x08,0x04,0x04,0x08],
+        'o':[0x38,0x44,0x44,0x44,0x38],
+        'i':[0x00,0x44,0x7D,0x40,0x00],
+        'c':[0x38,0x44,0x44,0x44,0x20],
+        's':[0x48,0x54,0x54,0x54,0x20],
+    }
+
+    char_width = 6
+    text_width = len(text) * char_width
+    start_x = (128 - text_width) // 2
+
+    page = 7  # bottom page
+
+    for i, char in enumerate(text):
+        char_data = font.get(char, [0x00]*5)
+
+        for col in range(5):
+            x = start_x + i * char_width + col
+            if 0 <= x < 128:
+                index = x + (page * 128)
+                buffer[index] = char_data[col]
+
+        # spacing column
+        x = start_x + i * char_width + 5
+        if 0 <= x < 128:
+            buffer[x + (page * 128)] = 0x00
+
+# -------- DISPLAY --------
+def display_image(buffer):
+    for page in range(8):
+        send_cmd(0xB0 + page)
+        send_cmd(0x00)
+        send_cmd(0x10)
+        start = page * 128
+        send_data(buffer[start:start+128])
+
+# -------- MAIN --------
+try:
+    init_display()
+
+    # Copy original buffer (important!)
+    buffer = elephant_bitmap.copy()
+
+    # Add centered text
+    draw_centered_text_on_buffer(buffer, "Elephantronics")
+
+    # Display final image
+    display_image(buffer)
+
+    print("🐘 Elephant + Elephantronics displayed!")
+
+except Exception as e:
+    print("Error:", e)
+
+finally:
+    i2c.close()
+```
+
+Run it:
+
+```bash
+python3 oled_image.py
+```
+
+The display script imports `elephant_bitmap` from the generated file, initialises
+the SSD1306, draws the bitmap, and optionally adds text.
+
+## UART
+
+### Overview
+
+UART7 is available on header pins 8 (TX) and 10 (RX) as `/dev/ttyS7`. This
+example uses a loopback: connect TX directly to RX and verify that transmitted
+bytes are received.
+
+### Wiring (loopback test)
+
+| Pin | Function | Connection |
+| --- | --- | --- |
+| 8 | UART7_TX | Connect to pin 10 |
+| 10 | UART7_RX | Connect to pin 8 |
+
+<Callout variant="caution" title="Do not connect RS-232 levels">
+  The header exposes 3.3 V TTL UART, not RS-232. Connecting a true RS-232 device
+  without a level converter can damage the board.
+</Callout>
+
+### Install the packages
+
+```bash title="Install UART tools"
+sudo apt update
+sudo apt install microcom python3-serial -y
+```
+
+### Test with microcom
+
+```bash title="Open UART7"
+sudo microcom -s 115200 -p /dev/ttyS7
+```
+
+Type characters in `microcom`; they should echo because TX and RX are connected.
+Exit with `Ctrl+X`.
+
+### Prepare Python UART access
+
+```bash title="Add the user to dialout"
+sudo usermod -a -G dialout $USER
+```
+
+```bash title="Install pyserial"
+pip install pyserial
+```
+
+Log out and back in, or reboot, before expecting the new group membership to
+apply.
+
+### Python loopback test
+
+Create `loopback_test.py`:
+
+```python title="loopback_test.py"
+import serial
+import time
+
+# Configuration for Purple Pi OH2 UART7
+UART_PORT = "/dev/ttyS7"
+BAUD_RATE = 115200
+
+try:
+    # Initialize serial port
+    ser = serial.Serial(
+        port=UART_PORT,
+        baudrate=BAUD_RATE,
+        bytesize=serial.EIGHTBITS,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        timeout=1
+    )
+
+    print(f"UART opened: {UART_PORT} @ {BAUD_RATE} baud")
+    print("Starting loopback test. Ensure TX (Pin 8) and RX (Pin 10) are connected.")
+    print("-" * 50)
+
+    counter = 0
+    while True:
+        # Construct and send a test message
+        message = f"Purple Pi OH2 Test #{counter}\n"
+        ser.write(message.encode())
+        print(f"Sent: {message.strip()}")
+
+        # Wait briefly for the echo
+        time.sleep(0.1)
+
+        # Check for received data
+        if ser.in_waiting:
+            response = ser.readline().decode(errors="ignore").strip()
+            if response:
+                print(f"Received: {response}")
+                if response == message.strip():
+                    print("--> Loopback SUCCESS!")
+                else:
+                    print("--> WARNING: Mismatch in sent/received data.")
+            else:
+                print("--> No data received (loopback failed).")
+        else:
+            print("--> No data in buffer (loopback failed).")
+
+        counter += 1
+        time.sleep(2) # Wait 2 seconds before next iteration
+
+except KeyboardInterrupt:
+    print("\nTest stopped by user.")
+except serial.SerialException as e:
+    print(f"Serial error: {e}")
+    print("Did you remember to connect Pin 8 to Pin 10?")
+finally:
+    if 'ser' in locals() and ser.is_open:
+        ser.close()
+        print("UART port closed.")
+```
+
+Run it:
+
+```bash
+python3 loopback_test.py
+```
+
+## SPI
+
+SPI0 is available on the 40-pin header:
+
+| Device | Header pins | Function |
+| --- | --- | --- |
+| `/dev/spidev0.0` | 19 (MOSI), 21 (MISO), 23 (SCLK), 24 (CS0) | SPI0 with chip select 0 |
+| `/dev/spidev0.1` | 19 (MOSI), 21 (MISO), 23 (SCLK), 26 (CS1) | SPI0 with chip select 1 |
+
+The MCP2515 CAN controller example uses CS1 and is covered in
+[CAN bus with the MCP2515](/single-board-computers/purple-pi-oh2/industrial-protocols/can-bus/).
+That page includes the wiring diagram, SPI permission note, driver code, and
+loopback test.
+
+## Permissions and safety
+
+- Prefer a udev rule or dedicated group over `chmod 666` on `/dev/gpiochip*`,
+  `/dev/i2c-*`, and `/dev/spidev*`.
+- Disconnect power before changing wiring.
+- Never apply 5 V to a 3.3 V GPIO or interface pin.
+- Verify the pin functions for your board revision; the header is mechanically
+  HAT-compatible but not electrically identical to a Raspberry Pi.
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 GPIO documentation. The scripts,
+pin map, and wiring follow that source. They have not been independently verified
+for this wiki; treat the page as a draft until tested on your board.

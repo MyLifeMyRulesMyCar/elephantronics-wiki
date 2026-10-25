@@ -1,0 +1,176 @@
+---
+title: NPU and YOLOv5 on the Purple Pi OH2
+description: Verify the RK3576 NPU, build the RKNN YOLOv5 demo, and run object detection on the Purple Pi OH2.
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Figure from '../../../../components/Figure.astro';
+import TechTags from '../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['NPU', 'RKNN', 'YOLOv5', 'Edge AI']} />
+
+<TutorialHeader
+  difficulty="Advanced"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running a vendor image with the RKNN runtime installed',
+    'Network access for the RKNN toolkit repository',
+    'Build tools and enough storage for the toolkit and model',
+    'A terminal session on the board',
+  ]}
+  note="The RKNN toolkit is a large repository and the build paths can change. Verify the compiler and example paths for the toolkit revision you clone."
+/>
+
+The RK3576 includes a neural processing unit rated at **6 TOPS** by the vendor.
+This page verifies that the NPU driver and runtime are present, then builds and
+runs the RKNN YOLOv5 demo.
+
+<Callout variant="note" title="Vision demo only">
+  The source documentation describes RKNN/RLLM as a broader AI toolkit, but this
+  page only covers the YOLOv5 vision demo. LLM and voice workloads need separate
+  model conversion and runtime instructions.
+</Callout>
+
+## Check that the NPU is ready
+
+```bash
+# 1. Check the NPU driver
+dmesg | grep -i npu
+
+# 2. Check the NPU device
+ls -la /dev/dri/
+
+# 3. Check the RKNN runtime library
+ls -l /usr/lib/librknnrt.so
+```
+
+Expected signs:
+
+- `dmesg` lines showing `RKNPU` and driver information.
+- Render nodes such as `renderD128` and `renderD129`.
+- `/usr/lib/librknnrt.so` exists.
+
+If any check fails, use the vendor image or install the matching runtime before
+continuing.
+
+## Install build tools
+
+```bash
+sudo apt update
+sudo apt install -y build-essential cmake git
+```
+
+## Download the RKNN toolkit
+
+```bash
+mkdir -p ~/Downloads
+cd ~/Downloads
+git clone https://github.com/airockchip/rknn-toolkit2.git
+```
+
+## Open the YOLOv5 demo
+
+```bash
+cd ~/Downloads/rknn-toolkit2/rknpu2/examples/rknn_yolov5_demo
+ls
+```
+
+The directory should contain `build-linux.sh`, `model/`, and `src/`.
+
+## Set up the compiler
+
+```bash
+export GCC_COMPILER=/usr/bin/aarch64-linux-gnu
+```
+
+<Callout variant="caution" title="Verify the compiler path">
+  The exported path depends on the image and cross-compiler layout. If the build
+  reports that the compiler is missing, inspect `build-linux.sh` and point
+  `GCC_COMPILER` at the compiler prefix that exists on your system.
+</Callout>
+
+## Build the demo
+
+```bash
+chmod +x build-linux.sh
+./build-linux.sh -t rk3576 -a aarch64 -b Release
+```
+
+- `-t rk3576` selects the SoC.
+- `-a aarch64` selects the architecture.
+- `-b Release` creates an optimized build.
+
+Minor warnings from optional video components can be ignored if the executable
+is produced.
+
+## Locate the binary
+
+```bash
+find ~/Downloads/rknn-toolkit2/rknpu2/examples/rknn_yolov5_demo \
+  -name "rknn_yolov5_demo" -type f
+```
+
+```bash
+cd ~/Downloads/rknn-toolkit2/rknpu2/examples/rknn_yolov5_demo/build/build_RK3576_linux_aarch64_Release
+ls
+```
+
+## Prepare the labels
+
+```bash
+mkdir -p model
+cp ../../model/coco_80_labels_list.txt model/
+chmod +x rknn_yolov5_demo
+```
+
+## Run YOLOv5
+
+```bash
+./rknn_yolov5_demo ../../model/RK3576/yolov5s-640-640.rknn ../../model/bus.jpg
+```
+
+Expected output:
+
+```text
+Loading mode...
+once run use 30.298000 ms
+person @ (209 243 286 510) 0.879723
+person @ (479 238 560 526) 0.870588
+bus @ (93 129 553 464) 0.700761
+save detect result to ./out.jpg
+```
+
+<Figure
+  src="/images/purple-pi-oh2/npu/yolo.webp"
+  alt="YOLOv5 object-detection result showing a bus and people with bounding boxes"
+  caption="Example YOLOv5 detection on the RK3576 NPU. Image from Elephantronics."
+  width={442}
+  height={586}
+  variant="narrow"
+/>
+
+Inference time and confidence scores vary with the model, input image, and
+thermal conditions. Treat the output above as an example.
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| No NPU device | Vendor kernel/driver and device-tree configuration |
+| `librknnrt.so` missing | Install the matching RKNN runtime for the image |
+| Compiler not found | Verify `GCC_COMPILER` and the toolkit build script |
+| Model file missing | Check the model path under `model/RK3576/` |
+| Demo runs but no detections | Model, labels, input image, and confidence threshold |
+| Build fails on optional video modules | Inspect the first error; the demo may still build |
+
+## Related pages
+
+- [Purple Pi OH2 overview](/single-board-computers/purple-pi-oh2/)
+- [OpenCV on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/opencv/)
+- [Single Board Computers](/single-board-computers/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 NPU documentation. The procedure and
+expected output have not been independently verified for this wiki.

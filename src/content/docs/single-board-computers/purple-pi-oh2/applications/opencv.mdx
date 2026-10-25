@@ -1,0 +1,87 @@
+---
+title: OpenCV on the Purple Pi OH2
+description: Install Python OpenCV with codec and GStreamer support on the Purple Pi OH2, then verify the build.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['OpenCV', 'Python', 'Computer Vision']} />
+
+<TutorialHeader
+  difficulty="Intermediate"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'A user with sudo access',
+    'Network access for packages',
+  ]}
+  note="Package names and OpenCV versions depend on the OS image. Confirm the version with the verification command."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/applications/opencv.webp"
+  alt="OpenCV computer-vision processing concept"
+  caption="OpenCV provides image processing, video analysis, and computer-vision primitives."
+  width={1200}
+  height={670}
+  variant="cover"
+/>
+
+OpenCV is an open-source computer-vision library used for image processing, video
+analysis, and vision-based applications. On the Purple Pi OH2 it can be combined
+with the camera interfaces or with the NPU demos.
+
+## Update the system
+
+```bash
+sudo apt update
+```
+
+## Install OpenCV and dependencies
+
+```bash title="Python, codecs, and GStreamer"
+sudo apt install python3-pil python3-numpy python3-pip git wget at-spi2-core
+sudo apt install libavcodec-dev libavformat-dev libswscale-dev
+sudo apt install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+sudo apt install python3-opencv libopencv-dev
+```
+
+The source document repeated the last `apt install` line; it only needs to run
+once.
+
+## Verify the installation
+
+```bash
+python3 -c "import cv2; print(cv2.__version__)"
+```
+
+A version such as `4.x.x` should print without errors.
+
+<Callout variant="note" title="Camera pipeline">
+  The distribution OpenCV package may use GStreamer for camera capture depending
+  on how it was built. If `cv2.VideoCapture()` cannot open a MIPI camera, check
+  the GStreamer pipeline and the camera device node first.
+</Callout>
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `ModuleNotFoundError: cv2` | Install `python3-opencv`; make sure you are using the system Python or the same virtual environment |
+| Version command fails | Re-run `sudo apt update` and inspect the apt error |
+| Camera opens but returns no frames | Check the device node and GStreamer plugins |
+| GUI window cannot open | Run over SSH with X forwarding or use a local display |
+
+## Related pages
+
+- [Purple Pi OH2 overview](/single-board-computers/purple-pi-oh2/)
+- [NPU and YOLOv5](/single-board-computers/purple-pi-oh2/npu/)
+- [Camera section in the overview](/single-board-computers/purple-pi-oh2/#camera-mipi-csi)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 OpenCV guide. The procedure has not
+been independently verified for this wiki.

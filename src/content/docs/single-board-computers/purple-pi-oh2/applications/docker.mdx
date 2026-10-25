@@ -1,0 +1,126 @@
+---
+title: Docker on the Purple Pi OH2
+description: Install Docker on the Purple Pi OH2, run containers without sudo, and verify the installation with the hello-world image.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['Docker', 'Containers', 'Purple Pi OH2']} />
+
+<TutorialHeader
+  difficulty="Intermediate"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'A user with sudo access',
+    'Network access for package and image downloads',
+  ]}
+  note="Commands follow Elephantronics' Purple Pi OH2 application guide. Package names and Docker behaviour vary by OS image."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/applications/docker.webp"
+  alt="Docker containers running on a single-board computer"
+  caption="Docker provides a repeatable container runtime on the Purple Pi OH2."
+  width={1200}
+  height={670}
+  variant="cover"
+/>
+
+Docker runs applications in isolated containers, so services such as Home
+Assistant can be installed without changing the host system for every dependency.
+This page installs Docker from the distribution repository and checks that it can
+run a container.
+
+## Install Docker
+
+```bash title="Update packages"
+sudo apt-get update
+```
+
+```bash title="Install Docker"
+sudo apt install docker.io
+```
+
+```bash
+docker -v
+```
+
+If `docker -v` prints a version, the client is installed.
+
+## Configure Docker (optional)
+
+The daemon configuration can be edited when you need to change storage, logging,
+or registry settings:
+
+```bash
+sudo nano /etc/docker/daemon.json
+sudo systemctl restart docker
+```
+
+The source guide leaves the file empty by default. Do not paste configuration
+from another system without checking that it matches the installed Docker
+version.
+
+## Run Docker without sudo
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+Log out of all SSH sessions and terminals, then log back in. Group membership is
+only applied to new sessions.
+
+<Callout variant="warning" title="Docker group is privileged">
+  Membership in the `docker` group allows running containers with elevated host
+  access. Only add trusted users, and prefer rootless Docker where the workload
+  allows it.
+</Callout>
+
+## Test the installation
+
+```bash
+docker run hello-world
+```
+
+The first run downloads the `hello-world` image and prints a confirmation
+message. If it fails, check that the Docker service is running:
+
+```bash
+sudo systemctl status docker
+```
+
+## Manage containers
+
+| Task | Command |
+| --- | --- |
+| List running containers | `docker ps` |
+| List all containers | `docker ps -a` |
+| Stop a container | `docker stop <name>` |
+| Start a container | `docker start <name>` |
+| View logs | `docker logs <name>` |
+| Remove a container | `docker rm <name>` |
+| List images | `docker images` |
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `docker: command not found` | The package install failed; rerun `sudo apt install docker.io` |
+| Permission denied on `/var/run/docker.sock` | Add the user to the `docker` group and start a new session |
+| Pull fails | Check DNS, proxy settings, and free disk space |
+| Container starts and exits immediately | Inspect `docker logs <name>` |
+
+## Next steps
+
+- [Home Assistant on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/home-assistant/)
+- [Node-RED on the Purple Pi OH2](/single-board-computers/purple-pi-oh2/applications/node-red/)
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 Docker guide. The procedure has not been
+independently verified for this wiki.

@@ -1,0 +1,219 @@
+---
+title: Modbus RTU with the Purple Pi OH2
+description: Connect an RS-485 transceiver to the Purple Pi OH2 UART, configure a Modbus slave, and read holding registers with Python.
+---
+
+import Callout from '../../../../../components/Callout.astro';
+import Figure from '../../../../../components/Figure.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['Modbus RTU', 'RS-485', 'UART', 'Python']} />
+
+<TutorialHeader
+  difficulty="Advanced"
+  status="draft"
+  prerequisites={[
+    'A Purple Pi OH2 running Debian or Ubuntu',
+    'A UART-to-RS-485 converter (the source used a MAX13487E board)',
+    'An RS-485-to-USB adapter for PC-side testing',
+    'Modbus Slave software on a PC, or a real Modbus device',
+    'Python 3 and basic serial-port knowledge',
+  ]}
+  note="RS-485 wiring and A/B polarity vary between transceiver boards. Verify the labels and use a common ground before connecting a live bus."
+/>
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/modbus.webp"
+  alt="Modbus RTU communication between the Purple Pi OH2 and industrial devices"
+  caption="Modbus RTU uses a serial physical layer, commonly RS-485, for deterministic field-device communication."
+  width={1200}
+  height={672}
+  variant="cover"
+/>
+
+For PC-side testing, the source uses
+[Modbus Slave](https://www.modbustools.com/download.html). A real Modbus device
+can be used instead.
+
+Modbus RTU is a widely used serial protocol for controllers, sensors, and
+actuators. It is simple, vendor-neutral, and well suited to noisy industrial
+environments when the physical layer is wired correctly.
+
+## Hardware
+
+| Component | Purpose |
+| --- | --- |
+| Purple Pi OH2 | Modbus master in this example |
+| UART-to-RS-485 converter | Converts 3.3 V UART to a differential RS-485 bus |
+| USB-to-RS-485 adapter | Connects a PC running Modbus Slave for testing |
+| Twisted pair | A and B differential pair plus ground |
+
+<Figure
+  src="/images/purple-pi-oh2/industrial/modbus-wiring.webp"
+  alt="RS-485 converter connected to the Purple Pi OH2 UART pins and a Modbus slave device"
+  caption="Example RS-485 wiring. Confirm the A/B labels on your converter; reversing them prevents communication."
+  width={1200}
+  height={655}
+/>
+
+## Wiring
+
+| Purple Pi OH2 | Converter | Note |
+| --- | --- | --- |
+| Pin 8, UART7_TX | RX | Cross TX to RX |
+| Pin 10, UART7_RX | TX | Cross RX to TX |
+| 3.3 V | VCC | Check that the converter accepts 3.3 V logic |
+| GND | GND | Common reference |
+| — | A | RS-485 A |
+| — | B | RS-485 B |
+
+<Callout variant="caution" title="Check the transceiver supply">
+  Some RS-485 boards require 5 V for the bus side even when the logic side is
+  3.3 V. Read the converter datasheet before connecting power. Do not apply 5 V
+  to a Purple Pi GPIO.
+</Callout>
+
+## Configure the Modbus slave
+
+1. Open Modbus Slave on the PC.
+2. Select the COM port of the USB-to-RS-485 adapter.
+3. Set **115200 baud, 8 data bits, no parity, 1 stop bit (8N1)**.
+4. Set the slave ID, for example `1`.
+5. Add one or more holding registers for testing.
+
+The Purple Pi script reads holding register `0` with function code `3`.
+
+## Set up the Python environment
+
+```bash
+mkdir Purple_pi_modbus
+cd Purple_pi_modbus
+python3 -m venv venv
+source venv/bin/activate
+pip install pyserial minimalmodbus
+```
+
+## Modbus test script
+
+Create `modbus_server_purplepi.py`:
+
+```python title="modbus_server_purplepi.py"
+#!/usr/bin/env python3
+import minimalmodbus
+import serial
+import time
+
+# --- Configuration ---
+PORT = '/dev/ttyS7'
+SLAVE_ADDRESS = 1
+BAUDRATE = 115200
+BYTESIZE = 8
+PARITY = serial.PARITY_NONE
+STOPBITS = 1
+TIMEOUT = 0.5
+
+# --- Register to Read ---
+REGISTER_ADDRESS = 0
+NUMBER_OF_REGISTERS = 1
+FUNCTION_CODE = 3
+
+# --- Create instrument object ---
+try:
+    instrument = minimalmodbus.Instrument(PORT, SLAVE_ADDRESS)
+    instrument.serial.baudrate = BAUDRATE
+    instrument.serial.bytesize = BYTESIZE
+    instrument.serial.parity = PARITY
+    instrument.serial.stopbits = STOPBITS
+    instrument.serial.timeout = TIMEOUT
+    instrument.mode = minimalmodbus.MODE_RTU
+    instrument.clear_buffers_before_each_transaction = True
+
+    print(f"Attempting to communicate with Modbus slave ID {SLAVE_ADDRESS} on {PORT}...")
+    print(f"Serial settings: {BAUDRATE} baud, {BYTESIZE}{PARITY}{STOPBITS}")
+    print("-" * 40)
+
+except Exception as e:
+    print(f"Error setting up serial port: {e}")
+    exit(1)
+
+# --- Test Communication ---
+try:
+    print("Reading holding registers...")
+    values = instrument.read_registers(
+        registeraddress=REGISTER_ADDRESS,
+        number_of_registers=NUMBER_OF_REGISTERS,
+        functioncode=FUNCTION_CODE
+    )
+
+    print(f"Successfully read {NUMBER_OF_REGISTERS} register(s) starting at address {REGISTER_ADDRESS}:")
+    for i, val in enumerate(values):
+        print(f"  Register {REGISTER_ADDRESS + i}: {val} (0x{val:04X})")
+
+except minimalmodbus.NoResponseError:
+    print(f"ERROR: No response from device {SLAVE_ADDRESS}.")
+    print("Check:")
+    print(f"  - Is the device powered and connected to {PORT}?")
+    print(f"  - Is the slave address correct?")
+    print(f"  - Are the baud rate and serial settings correct?")
+    print("  - Is the register address valid and readable?")
+
+except minimalmodbus.InvalidResponseError as e:
+    print("ERROR: Invalid response received.")
+    print(f"Details: {e}")
+
+except Exception as e:
+    print(f"Unexpected error: {e}")
+
+finally:
+    if instrument.serial:
+        instrument.serial.close()
+        print("Serial port closed.")
+```
+
+## Serial permissions
+
+```bash
+sudo usermod -a -G dialout $USER
+```
+
+Log out and back in, or reboot, before running the script. Confirm the UART
+device:
+
+```bash
+ls -l /dev/ttyS7
+```
+
+## Run the test
+
+```bash
+cd Purple_pi_modbus
+source venv/bin/activate
+python3 modbus_server_purplepi.py
+```
+
+A successful read prints the register value in decimal and hexadecimal. If the
+script reports no response, check the port, slave ID, baud rate, A/B polarity,
+and common ground.
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| `No response from device` | Slave ID, baud rate, 8N1 settings, A/B polarity, power |
+| Permission denied on `/dev/ttyS7` | Add the user to `dialout` and start a new session |
+| Values are wrong or shifted | Register address and function code |
+| Intermittent errors | Termination, cable length, grounding, and noise |
+| Converter does not respond | Logic voltage and whether the bus side needs 5 V |
+
+## Notes
+
+- The source uses `/dev/ttyS7`; confirm the UART device on your image.
+- Add 120 Ω termination at both ends if the bus is long or reflections appear.
+- Keep the RS-485 A/B pair twisted and provide a common reference ground.
+- Modbus RTU is a master/slave protocol; only one master should be active.
+
+## Source
+
+Adapted from Elephantronics' Purple Pi OH2 Modbus RTU guide. The procedure and
+script have not been independently verified for this wiki.

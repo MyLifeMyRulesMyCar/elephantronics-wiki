@@ -1,0 +1,67 @@
+---
+title: Applications
+description: Run Docker, Node-RED, OpenCV, ROS 2, and Home Assistant on the Purple Pi OH2 with step-by-step installation guides.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Callout from '../../../../../components/Callout.astro';
+import TechTags from '../../../../../components/TechTags.astro';
+
+<TechTags tags={['Docker', 'Node-RED', 'OpenCV', 'ROS 2', 'Home Assistant']} />
+
+The Purple Pi OH2 can host containerised services, visual automation flows,
+computer-vision tools, robotics middleware, and a home-automation platform. These
+guides use the board's Debian or Ubuntu environment and assume terminal access.
+
+<Callout variant="warning" title="Draft documentation">
+  These procedures are adapted from Elephantronics' Purple Pi OH2 documentation
+  and have not been independently verified for this wiki. Check package names and
+  versions against your OS image.
+</Callout>
+
+## Before you start
+
+- A Purple Pi OH2 with network access.
+- SSH or local terminal access.
+- A user that can run `sudo`.
+- Enough free storage for Docker images, OpenCV packages, and ROS 2.
+
+Some guides depend on Docker. Install Docker first if you plan to use Home
+Assistant, and verify it with `docker run hello-world` before continuing.
+
+## Choose an application
+
+<CardGrid>
+  <LinkCard
+    title="Docker"
+    href="/single-board-computers/purple-pi-oh2/applications/docker/"
+    description="Install Docker, run it without sudo, and verify the container runtime."
+  />
+  <LinkCard
+    title="Node-RED"
+    href="/single-board-computers/purple-pi-oh2/applications/node-red/"
+    description="Install the browser-based flow editor for IoT and automation projects."
+  />
+  <LinkCard
+    title="OpenCV"
+    href="/single-board-computers/purple-pi-oh2/applications/opencv/"
+    description="Install Python OpenCV with GStreamer and codec support, then verify the build."
+  />
+  <LinkCard
+    title="ROS 2 Humble"
+    href="/single-board-computers/purple-pi-oh2/applications/ros2/"
+    description="Install ROS 2, run the talker/listener demo, and start Turtlesim."
+  />
+  <LinkCard
+    title="Home Assistant"
+    href="/single-board-computers/purple-pi-oh2/applications/home-assistant/"
+    description="Run Home Assistant Container with Docker and reach it on port 8123."
+  />
+</CardGrid>
+
+## Related pages
+
+- [Purple Pi OH2 overview](/single-board-computers/purple-pi-oh2/)
+- [GPIO and interfaces](/single-board-computers/purple-pi-oh2/gpio/)
+- [Industrial protocols](/single-board-computers/purple-pi-oh2/industrial-protocols/)
+- [NPU and AI](/single-board-computers/purple-pi-oh2/npu/)
