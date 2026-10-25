@@ -76,7 +76,8 @@ src/content/docs/
 │  ├─ muse-pro-pi/
 │  │  ├─ index.mdx                        Introduction and first boot
 │  │  ├─ benchmark-deep-dive.mdx          Benchmark results
-│  │  └─ object-detection.mdx             YOLOv8 object detection
+│  │  ├─ object-detection.mdx             YOLOv8 object detection
+│  │  └─ asr.mdx                          SenseVoice speech-to-text
 │  └─ purple-pi-oh2/
 │     ├─ index.mdx                        Overview and quick start
 │     ├─ gpio.mdx                         GPIO, I2C, UART, SPI
@@ -167,7 +168,8 @@ public/images/
 ├─ dht22-arduino-uno-oled/
 ├─ muse-pro-pi/
 │  ├─ benchmark/
-│  └─ object-detection/
+│  ├─ object-detection/
+│  └─ asr/
 ├─ purple-pi-oh2/
 │  ├─ overview/
 │  ├─ gpio/

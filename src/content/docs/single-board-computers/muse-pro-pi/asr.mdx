@@ -1,0 +1,223 @@
+---
+title: Speech-to-text with SenseVoice on the Muse Pro Pi
+description: Set up the SpacemiT AI SDK, run SenseVoice ASR, and fix the TCM allocation bug on the RISC-V Muse Pro Pi.
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Figure from '../../../../components/Figure.astro';
+import TechTags from '../../../../components/TechTags.astro';
+import TutorialHeader from '../../../../components/TutorialHeader.astro';
+
+<TechTags tags={['ASR', 'SenseVoice', 'NPU', 'Edge AI', 'SpacemiT AI SDK', 'RISC-V']} />
+
+<TutorialHeader
+  difficulty="Advanced"
+  status="draft"
+  prerequisites={[
+    'A Muse Pro Pi running Bianbu Linux',
+    'Network access on the board',
+    'Terminal or SSH access',
+    'Enough free storage for the SDK and the ASR models',
+    'Comfort with Linux commands and environment variables',
+  ]}
+  note="The commands and model list follow Elephantronics' ASR document. The workflow has not been independently reproduced for this wiki; SDK versions and model paths can change."
+/>
+
+The Muse Pro Pi can run speech recognition locally on its RISC-V SoC and NPU.
+This tutorial sets up the SpacemiT AI SDK, builds only the ASR component,
+downloads a sample audio file, works around a TCM allocation bug in
+`spacemit-ort` 2.0.3, and runs the SenseVoice C++ demo.
+
+<Callout variant="note" title="Hardware naming">
+  The source calls the processor the **K1** SoC. Elephantronics' board
+  introduction calls it the **SpacemiT M1**. Both refer to the eight-core RISC-V
+  platform described in the vendor material; confirm the exact SoC revision and
+  NPU specification with the seller before relying on a particular number.
+</Callout>
+
+<Callout variant="caution" title="Network and storage">
+  The SDK clone, build dependencies, and first model download need network access
+  and free storage. The source estimates the SenseVoice model at about 200 MB;
+  the SDK and build output need additional space.
+</Callout>
+
+## Supported ASR models
+
+The SpacemiT AI SDK exposes several speech-recognition models. The source
+document lists these options:
+
+| Model | Intended use |
+| --- | --- |
+| SenseVoice | Default C++ demo. Fast continuous transcription with automatic language detection, punctuation, and emotion recognition. |
+| Qwen3-ASR (1.7B) | Larger Transformer model served through `llama-server`; better accuracy for complex audio. |
+| Fun-ASR Nano | Lightweight model for quick transcription tasks. |
+| Gemma4 ASR | Multimodal model that can transcribe source-language audio and translate foreign-language speech into English. |
+
+This page uses **SenseVoice** because it has a native C++ interface and is the
+quickest way to verify the hardware pipeline. The other models need separate
+model and server setup and are not covered here.
+
+<Callout variant="note" title="Model names can change">
+  Model names, file sizes, and download paths follow the source document and the
+  SDK revision it used. Check the SDK model zoo before relying on a specific
+  model or filename.
+</Callout>
+
+## Step 1: Workspace and SDK setup
+
+The SDK uses Git submodules for its components, including ASR and vision. Clone
+it with `--recurse-submodules` so those components are present.
+
+```bash title="Create the workspace and clone the SDK"
+# Create a dedicated workspace
+cd ~
+mkdir muse-pi-asr-article
+cd muse-pi-asr-article
+
+# Clone the SDK with its submodules
+git clone --recurse-submodules https://github.com/spacemit-com/ai-sdk.git
+cd ai-sdk
+```
+
+## Step 2: Build the ASR component
+
+The full SDK is large, but this project only needs the ASR module. Loading the
+SDK build environment and building that module is faster than building
+everything.
+
+```bash title="Build the ASR component"
+# Load the build environment
+source build/envsetup.sh
+
+# Build only the ASR component
+cd asr && mm
+```
+
+`cd asr` changes the shell's current directory. Return to the SDK root before
+running the demo, or open a new terminal and load the environment again.
+
+## Step 3: Download the sample audio
+
+The SDK provides official sample audio. Create the cache directory the demo
+expects, then download the Chinese weather-forecast clip:
+
+```bash title="Download the sample weather clip"
+mkdir -p ~/.cache/models/assets/audio
+cd ~/.cache/models/assets/audio
+
+wget https://archive.spacemit.com/spacemit-ai/model_zoo/assets/audio/001_zh_daily_weather.wav
+```
+
+The expected transcription is `今天天气怎么样?` — "What's the weather like
+today?" in English.
+
+## Step 4: Fix the TCM allocation error
+
+With the stock `spacemit-ort` package from the Bianbu repository, the demo may
+stop with this error:
+
+```text
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  tcm buffer acquire failed for core id 1.
+```
+
+<Callout variant="warning" title="This is a known runtime bug">
+  The source identifies this as a bug in `spacemit-ort` (ONNX Runtime) version
+  2.0.3, related to Tightly Coupled Memory allocation across the K1 NPU cores.
+  It is not a mistake in the build commands. Upgrade to the patched 2.0.5
+  library before running the demo.
+</Callout>
+
+Download `spacemit-ort.riscv64.2.0.5.tar.gz` from the SpacemiT ONNX Runtime
+release page referenced by the source. Transfer it to the board, or download it
+directly on the board if the image has a browser or downloader.
+
+For example, from your computer:
+
+```bash
+scp spacemit-ort.riscv64.2.0.5.tar.gz user@<board-ip>:~/
+```
+
+Then extract it on the board:
+
+```bash title="Extract the patched runtime"
+mkdir -p ~/spacemit-ort-2.0.5
+tar -xzf spacemit-ort.riscv64.2.0.5.tar.gz -C ~/spacemit-ort-2.0.5
+```
+
+The library path used below assumes the archive extracts to
+`~/spacemit-ort-2.0.5/spacemit-ort.riscv64.2.0.5/lib`. Check the extracted
+directory if your archive has a different layout.
+
+## Step 5: Run speech-to-text inference
+
+Return to the SDK root and run `asr_file_demo`. The `LD_LIBRARY_PATH` prefix
+loads the patched 2.0.5 libraries for this command only instead of the system
+defaults.
+
+```bash title="Run SenseVoice with the patched runtime"
+cd ~/muse-pi-asr-article/ai-sdk
+
+LD_LIBRARY_PATH="$HOME/spacemit-ort-2.0.5/spacemit-ort.riscv64.2.0.5/lib:$LD_LIBRARY_PATH" \
+  ./output/staging/bin/asr_file_demo ~/.cache/models/assets/audio/001_zh_daily_weather.wav
+```
+
+The source command used the absolute path `/home/kasun/...`. This page uses
+`$HOME` so the command works for your own user.
+
+<Callout variant="note" title="Why use LD_LIBRARY_PATH?">
+  The prefix applies only to this command. It does not permanently replace the
+  system `spacemit-ort` package, so keep the environment variable in the command
+  when you run the demo.
+</Callout>
+
+## What to expect
+
+A successful run follows three stages:
+
+1. **Model download:** the SenseVoice ONNX model is fetched into `~/.cache`,
+   about 200 MB according to the source.
+2. **Initialization:** the SpacemiT Execution Provider starts and uses the K1
+   NPU.
+3. **Transcription:** the WAV file is processed and the transcribed text is
+   printed in the terminal, with punctuation.
+
+<Figure
+  src="/images/muse-pro-pi/asr/terminal-result.webp"
+  alt="Terminal output from the SenseVoice ASR demo on the Muse Pro Pi, showing timing information and the Chinese transcription of a weather clip"
+  caption="Author's terminal output after warm-up: 今天天气怎么样? (What's the weather like today?). The screenshot shows one run, not a controlled benchmark."
+  width={1800}
+  height={728}
+/>
+
+The screenshot shows a 10.57 s warm-up followed by a 0.67 s model pass for a
+1.62 s clip, with an RTF of 0.416. Treat those numbers as one author-run example.
+The first run includes warm-up work, so do not use it to estimate steady-state
+throughput.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| `tcm buffer acquire failed for core id 1` | Use the patched `spacemit-ort` 2.0.5 library through `LD_LIBRARY_PATH`. Confirm the extracted `lib` path is correct. |
+| `asr_file_demo: command not found` | Build the ASR component with `cd asr && mm`, then confirm the binary exists at `output/staging/bin/asr_file_demo`. |
+| Model download stalls or fails | Check network access and free space in `~/.cache`; the model is roughly 200 MB. |
+| The wrong audio is transcribed | Confirm the file is at `~/.cache/models/assets/audio/001_zh_daily_weather.wav` and pass the full path to the demo. |
+| The first run is much slower | Warm-up is expected. Compare a later pass, not the warm-up line. |
+
+## Next steps
+
+The source's next step is Qwen3-ASR (1.7B): host the larger model with
+`llama-server` and use `asr_file_demo` as an HTTP client. That path needs
+additional model and server setup and is not covered in this page.
+
+## Source
+
+This page is adapted from Elephantronics' *ASR on SpacemiT Muse Pi Pro*
+document. The commands, model list, TCM workaround, and terminal screenshot
+follow that document. The workflow has not been independently reproduced for
+this wiki; check the current SDK and model paths before relying on the exact
+commands.
+
+The terminal screenshot shows the author's `/home/kasun` path. The commands on
+this page use `$HOME` instead so they work for your user.

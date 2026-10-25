@@ -87,6 +87,10 @@ export default defineConfig({
                   label: 'Object detection',
                   slug: 'single-board-computers/muse-pro-pi/object-detection',
                 },
+                {
+                  label: 'Speech-to-text (ASR)',
+                  slug: 'single-board-computers/muse-pro-pi/asr',
+                },
               ],
             },
             {
