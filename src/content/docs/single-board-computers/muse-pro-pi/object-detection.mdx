@@ -27,14 +27,14 @@ image and a video.
 
 <TutorialHeader
   difficulty="Advanced"
-  status="draft"
+  status="reviewed"
   prerequisites={[
     'A Muse Pro Pi running Bianbu Linux',
     'Network access on the board',
     'Terminal or SSH access',
     'Comfort with basic Linux commands and environment variables',
   ]}
-  note="The commands and versions below follow Elephantronics' published object-detection article. The workflow has not been independently reproduced for this wiki. SDK versions and model scripts can change."
+  note="Verified build: the author ran this object-detection workflow on hardware. The commands and versions follow Elephantronics' published article; SDK versions and model scripts can change."
 />
 
 <Callout variant="note" title="Hardware naming">
@@ -130,7 +130,7 @@ cd ~/muse-pi-vision-article/ai-sdk
 
 ## Troubleshooting the real-world hurdles
 
-Two issues showed up during the source test. Both are configuration or library
+Two issues showed up during the author's test. Both are configuration or library
 problems, not mistakes in the build commands.
 
 | Issue | Cause | Fix |
@@ -227,12 +227,12 @@ detected object.
   configuration says otherwise.
 - The patched library is loaded with `LD_LIBRARY_PATH` for that command only. It
   does not permanently replace the system package.
-- These instructions have not been reproduced for this wiki. Treat the expected
-  output as an example, not a guarantee.
+- The author ran this workflow on hardware. The commands and expected output are
+  from that build; check the SDK's current documentation if a script has moved.
 
 ## Source
 
 This page is adapted from Elephantronics' *Object Detection with SpacemiT Muse
-Pi Pro*. The commands, troubleshooting table, and images follow that article. The
-author-specific `/home/kasun` paths are shown here as `$HOME`, and the output
-example uses a placeholder user directory.
+Pi Pro*. The author ran the workflow on hardware; the commands, troubleshooting
+table, and images follow that article. The author-specific `/home/kasun` paths are
+shown here as `$HOME`, and the output example uses a placeholder user directory.

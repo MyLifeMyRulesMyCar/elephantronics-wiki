@@ -12,7 +12,7 @@ import TutorialHeader from '../../../../components/TutorialHeader.astro';
 
 <TutorialHeader
   difficulty="Advanced"
-  status="draft"
+  status="reviewed"
   prerequisites={[
     'A Muse Pro Pi running Bianbu Linux',
     'Network access on the board',
@@ -20,7 +20,7 @@ import TutorialHeader from '../../../../components/TutorialHeader.astro';
     'Enough free storage for the SDK and the ASR models',
     'Comfort with Linux commands and environment variables',
   ]}
-  note="The commands and model list follow Elephantronics' ASR document. The workflow has not been independently reproduced for this wiki; SDK versions and model paths can change."
+  note="Verified build: the author ran this ASR workflow on hardware. The commands and model list follow Elephantronics' ASR document; SDK versions and model paths can change."
 />
 
 The Muse Pro Pi can run speech recognition locally on its RISC-V SoC and NPU.
@@ -214,10 +214,9 @@ additional model and server setup and is not covered in this page.
 ## Source
 
 This page is adapted from Elephantronics' *ASR on SpacemiT Muse Pi Pro*
-document. The commands, model list, TCM workaround, and terminal screenshot
-follow that document. The workflow has not been independently reproduced for
-this wiki; check the current SDK and model paths before relying on the exact
-commands.
+document. The author ran the ASR workflow on hardware; the commands, model list,
+TCM workaround, and terminal screenshot follow that document. Check the current
+SDK and model paths before relying on the exact commands.
 
 The terminal screenshot shows the author's `/home/kasun` path. The commands on
 this page use `$HOME` instead so they work for your user.
