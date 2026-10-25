@@ -1,0 +1,331 @@
+---
+title: Obstacle-avoiding robot car
+description: Build an Arduino Uno robot car with an L298N motor driver, HC-SR04 ultrasonic sensor, and SG90 servo. Includes assembly photos, wiring tables, testing, and turn calibration.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import Callout from '../../../components/Callout.astro';
+import Figure from '../../../components/Figure.astro';
+import TechTags from '../../../components/TechTags.astro';
+import TutorialHeader from '../../../components/TutorialHeader.astro';
+import WiringTable from '../../../components/WiringTable.astro';
+
+<TechTags tags={['Arduino Uno', 'L298N', 'HC-SR04', 'SG90', 'Robotics']} />
+
+<TutorialHeader
+  difficulty="Beginner"
+  status="draft"
+  prerequisites={[
+    'Arduino IDE installed on your computer',
+    'Basic soldering and breadboard experience',
+    'A charged 3 × 18650 battery pack and a compatible charger',
+    'The chassis, motors, driver, sensor, servo, and fasteners listed below',
+  ]}
+  note="The sketches are hosted externally on Google Drive and are not embedded in this wiki. The build steps and wiring have not been independently verified for this wiki."
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-complete.webp"
+  alt="Completed obstacle-avoiding robot car with four wheels, Arduino Uno, L298N driver, battery holder, and front ultrasonic sensor"
+  caption="Completed obstacle-avoiding car. Image from Elephantronics' build tutorial."
+  width={1377}
+  height={768}
+  variant="cover"
+  priority
+/>
+
+This beginner project builds a four-wheel robot car that drives forward until an
+ultrasonic sensor detects an obstacle. It then stops, backs up, scans left and
+right with a servo-mounted sensor, and turns toward the side with more space.
+
+The build has four stages: chassis assembly, electronics placement, wiring, and
+testing with calibration. The wiring section is the most detailed part; check
+every connection before applying power.
+
+<Callout variant="warning" title="Draft build">
+  The instructions follow Elephantronics' published tutorial, but the robot has
+  not been built or measured for this wiki. The source code is only available as
+  two external Google Drive folders, and some source photos were not available.
+  Treat this page as a draft and verify the wiring against your own hardware.
+</Callout>
+
+## Safety before you start
+
+- Disconnect the battery before changing any wiring.
+- A 3 × 18650 pack is about 11.1 V nominal. Check the pack, switch, and L298N
+  input rating before connecting them.
+- Keep a **common ground** between the battery, L298N, Arduino, and breadboard.
+- Do not power the servo from the Arduino 5 V pin while the motors are running.
+- Secure the robot before the first motor test; it can drive off a table.
+
+## Components
+
+| Component | Purpose |
+| --- | --- |
+| Arduino Uno | Runs the control program |
+| L298N motor driver module | Controls motor direction and speed |
+| 4 × DC gear motors + wheels | Drive the four wheels |
+| HC-SR04 ultrasonic sensor + bracket | Measures distance to an obstacle |
+| SG90 180° servo | Rotates the sensor to scan left and right |
+| 3 × 18650 battery holder + batteries | Main power supply, about 11.1 V nominal |
+| Mini breadboard | 5 V and ground distribution |
+| On/off switch | Switches the battery line |
+| Chassis plates, 6 copper spacers, screws, nuts, motor wires | Mechanical structure and fasteners |
+
+No shop links or prices are included here; source the parts from a supplier you
+trust and check the voltage/current ratings.
+
+## Chassis assembly
+
+<Steps>
+1. Remove the protective film from both acrylic chassis plates and prepare the screws, nuts, and spacers.
+2. Solder one red and one black wire to each DC gear motor. Red is positive; black is negative. Check that the joints are firm.
+3. Align the motors with the mounting slots and fix them with screws and nuts. A loose motor makes the robot vibrate or track poorly.
+4. Push the wheels onto the motor shafts until they are fully seated.
+5. Install the six copper spacers, place the upper chassis plate on top, and tighten the screws.
+</Steps>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/chassis-parts.webp"
+  alt="Acrylic chassis plates, four yellow DC gear motors, wheels, battery holder, spacers, screws, and tools laid out"
+  caption="Chassis plates, motors, wheels, fasteners, and battery holder before assembly."
+  width={1359}
+  height={768}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/chassis-motors.webp"
+  alt="Four DC gear motors and wheels fitted to the lower chassis plate"
+  caption="Motors and wheels mounted on the lower chassis plate."
+  width={1372}
+  height={768}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/chassis-assembled.webp"
+  alt="Assembled acrylic chassis with upper plate, copper spacers, and wheels"
+  caption="Upper chassis plate installed on the copper spacers."
+  width={1378}
+  height={768}
+/>
+
+## Electronics placement
+
+Mount the SG90 servo at the front of the chassis. Attach the ultrasonic bracket
+to the servo horn, then mount the HC-SR04 on the bracket so it can scan left and
+right. Place the remaining parts in this order:
+
+1. Mini breadboard, fixed with hot glue or double-sided tape
+2. Arduino Uno
+3. L298N motor driver
+4. On/off switch
+5. 18650 battery holder
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/servo-sensor-mount.webp"
+  alt="SG90 servo and HC-SR04 ultrasonic sensor mounted on a bracket at the front of the chassis"
+  caption="Servo and ultrasonic sensor at the front of the robot."
+  width={1354}
+  height={768}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/electronics-layout.webp"
+  alt="Arduino Uno, L298N motor driver, breadboard, switch, and battery holder placed on the robot chassis"
+  caption="Suggested electronics layout. Keep the battery holder and motor wires clear of the wheels."
+  width={1374}
+  height={768}
+/>
+
+## Wiring
+
+### DC motors to the L298N
+
+| Motor side | Wire colour | L298N terminal |
+| --- | --- | --- |
+| Right side, both motors | Red (positive) | OUT1 |
+| Right side, both motors | Black (negative) | OUT2 |
+| Left side, both motors | Black (negative) | OUT3 |
+| Left side, both motors | Red (positive) | OUT4 |
+
+<Callout variant="note" title="The left side is intentionally reversed">
+  The black/red order on the left side is opposite to the right side. That makes
+  both sides rotate the same way when the robot moves forward. If the robot spins
+  in place during testing, swap the two motor wires on one side.
+</Callout>
+
+### Power supply
+
+<WiringTable
+  caption="Example wiring — battery, switch, L298N, and Arduino power"
+  fromLabel="From"
+  toLabel="To"
+  rows={[
+    { from: 'Battery holder red', to: 'One side of the on/off switch' },
+    { from: 'Switch, other side', to: 'L298N 12 V input' },
+    { from: 'Battery holder black', to: 'L298N GND' },
+    { from: 'L298N GND', to: 'Arduino GND' },
+    { from: 'L298N GND', to: 'Breadboard GND rail' },
+    { from: 'L298N 5 V output', to: 'Arduino VIN', note: 'Verify this power path; see the caution below' },
+    { from: 'L298N 5 V output', to: 'Breadboard 5 V rail' },
+  ]}
+  note="The common ground is mandatory. Without it the L298N may ignore the Arduino control signals."
+/>
+
+<Callout variant="caution" title="Verify the Arduino power path">
+  The source connects the L298N 5 V output to the Arduino **VIN** pin. On a classic
+  Arduino Uno, VIN expects a higher input for the onboard regulator, so this
+  connection may not power the board reliably. Some builds feed the Uno through
+  the 5 V pin instead, but back-powering through USB or the 5 V pin has its own
+  risks. Check the regulator on your boards and measure the 5 V rail before
+  connecting the Arduino.
+</Callout>
+
+### HC-SR04 ultrasonic sensor
+
+<WiringTable
+  caption="Example wiring — HC-SR04 to Arduino and breadboard"
+  fromLabel="HC-SR04 pin"
+  toLabel="Connection"
+  rows={[
+    { from: 'GND', to: 'Breadboard GND rail' },
+    { from: 'ECHO', to: 'Arduino D2' },
+    { from: 'TRIG', to: 'Arduino D3' },
+    { from: 'VCC', to: 'Breadboard 5 V rail' },
+  ]}
+/>
+
+<Callout variant="note" title="Sensor supply">
+  The HC-SR04 is commonly used at 5 V. Check the module you have; some variants
+  and clones have different input requirements.
+</Callout>
+
+### SG90 servo
+
+<WiringTable
+  caption="Example wiring — SG90 servo"
+  fromLabel="SG90 wire"
+  toLabel="Connection"
+  rows={[
+    { from: 'Brown or black', to: 'Breadboard GND rail' },
+    { from: 'Red', to: 'Breadboard 5 V rail' },
+    { from: 'Orange (signal)', to: 'Arduino D5' },
+  ]}
+  note="Power the servo from the breadboard 5 V rail supplied by the L298N, not from the Arduino 5 V pin while the motors are running."
+/>
+
+### L298N signal wiring
+
+<WiringTable
+  caption="Example wiring — L298N control signals to Arduino"
+  fromLabel="L298N pin"
+  toLabel="Arduino pin"
+  rows={[
+    { from: 'ENA', to: 'D11', note: 'PWM, right-side speed' },
+    { from: 'IN1', to: 'D10', note: 'Right-side direction' },
+    { from: 'IN2', to: 'D9', note: 'Right-side direction' },
+    { from: 'IN3', to: 'D8', note: 'Left-side direction' },
+    { from: 'IN4', to: 'D7', note: 'Left-side direction' },
+    { from: 'ENB', to: 'D6', note: 'PWM, left-side speed' },
+  ]}
+/>
+
+<Callout variant="warning" title="PWM and jumpers">
+  ENA and ENB must connect to PWM-capable pins (D11 and D6 here) for speed control.
+  Remove the ENA/ENB jumper caps on the L298N when driving those pins with PWM.
+</Callout>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-signal-diagram.webp"
+  alt="Robot wiring diagram showing battery, switch, L298N, Arduino Uno, breadboard, four motors, HC-SR04, and SG90 servo connections"
+  caption="Example signal and power wiring. The tables above remain the source of truth for pin assignments."
+  width={1381}
+  height={651}
+/>
+
+## Testing and calibration
+
+### 1. Motor movement test
+
+Run the motor test **before** the obstacle-avoidance program. The robot should
+perform this sequence:
+
+1. Forward
+2. Backward
+3. Turn right
+4. Turn left
+
+Download the sketch from Elephantronics' official Google Drive folder:
+
+- [Motor Test Code](https://drive.google.com/drive/folders/1gxc3b70aacLbaBtZTAxml7kWeQfcernX?usp=sharing) — opens Google Drive.
+
+Select the correct Arduino board and port, upload the sketch, insert the
+batteries, and watch the sequence. If a movement is wrong, swap the two motor
+wires on the affected side at the L298N terminals.
+
+<Callout variant="note" title="External code">
+  The sketch is hosted outside this wiki. Review it before uploading and confirm
+  the pin numbers match the wiring on your robot.
+</Callout>
+
+### 2. Obstacle-avoidance code
+
+After the motor test passes, upload the main program:
+
+- [Obstacle Avoiding Code](https://drive.google.com/drive/folders/1vQ37JGU6ZoZTjKv79yUHecKnehNF55rR?usp=sharing) — opens Google Drive.
+
+In the main loop, the robot measures the distance ahead:
+
+- **No obstacle within 25 cm:** drive forward.
+- **Obstacle detected:** stop, reverse slightly, scan right and left with the
+  servo, compare the two distances, and turn toward the side with more space.
+
+The 25 cm threshold and the scan angles are examples from the source. Tune them
+for your robot's size, speed, and surface.
+
+### 3. Calibration
+
+During the source test, the robot turned almost 180° at every obstacle. The fix
+was to reduce the delay in `turnRight()` and `turnLeft()` from **900 ms to
+400 ms**. A shorter delay produces a shorter turn.
+
+- Re-upload after changing the delay.
+- Tune in steps of about 100 ms until a turn is roughly 90°.
+- Carpet and smooth floors may need different values.
+- If the robot still over-rotates, reduce the delay further; if it under-rotates,
+  increase it slightly.
+
+## Troubleshooting
+
+| Issue | Check |
+| --- | --- |
+| Robot spins in place | Swap the two motor wires on one side |
+| No movement | Battery charge, switch, L298N power, common ground |
+| One side does not move | Motor wiring, L298N output, ENA/ENB signal |
+| Servo jitters or the Arduino resets | Servo current draw, shared ground, 5 V rail |
+| Distance readings are erratic | TRIG/ECHO pins, sensor supply, angle, and reflective surfaces |
+| Robot turns too far | Reduce the turn delay |
+| Robot does not turn enough | Increase the turn delay slightly |
+| Motors run but the sensor does not | D2/D3 wiring and the sketch's pin definitions |
+
+## Related pages
+
+- [Robotics overview](/robotics/)
+- [Microcontrollers](/microcontrollers/)
+- [Circuit Design](/circuit-design/)
+- [Troubleshooting](/troubleshooting/)
+
+## Source and verification
+
+Adapted from
+[Obstacle Avoiding Robot Car — Step-by-Step Build Tutorial](https://elephantronics.lk/obstacle-avoidance-robot.html)
+on elephantronics.lk. The assembly steps, wiring tables, and calibration notes
+follow that article.
+
+The Arduino sketches are hosted in the two Google Drive folders linked above;
+they are not embedded in this repository. Ten of the source article's images
+(wiring diagrams 06–11 and test photos 14–17) were not available in the copied
+assets, so they are omitted; the wiring tables cover those connections.
+
+The robot has not been assembled or measured for this wiki. Treat the page as a
+draft until the build and code have been verified on hardware.

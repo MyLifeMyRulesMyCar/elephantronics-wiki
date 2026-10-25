@@ -2,14 +2,14 @@
 import { Aside } from '@astrojs/starlight/components';
 
 interface Props {
-  variant?: 'note' | 'tip' | 'warning';
+  variant?: 'note' | 'tip' | 'warning' | 'caution';
   title?: string;
 }
 
 const { variant = 'note', title } = Astro.props;
 
-// Starlight's Aside uses `caution`; expose a friendlier `warning` alias.
-const type = variant === 'warning' ? 'caution' : variant;
+// Starlight's Aside calls this variant `caution`; accept both spellings.
+const type = variant === 'warning' || variant === 'caution' ? 'caution' : variant;
 ---
 
 <Aside type={type} title={title}>

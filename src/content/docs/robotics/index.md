@@ -52,10 +52,19 @@ the current error, an integral term corrects accumulated offset, and a derivativ
 term damps oscillation. Tuning starts with the proportional term alone, at a low
 output limit, on a robot that cannot drive off the bench.
 
+## Builds
+
+### Obstacle-avoiding robot car
+
+A four-wheel Arduino Uno car with an L298N motor driver, an HC-SR04 ultrasonic
+sensor, and an SG90 servo. The guide covers chassis assembly, wiring tables, a
+motor test, the obstacle-avoidance program, and turn calibration.
+
+[Build the obstacle-avoiding robot car →](/robotics/obstacle-avoidance-car/)
+
 ## Planned topics
 
-- Driving a DC motor with a PWM motor driver, including a current-limited bench
-  test.
+- A current-limited bench test for a DC motor, including stall current.
 - Reading quadrature encoders and measuring speed.
 - A first PID speed loop with plots from real data.
 - I2C and SPI sensors: bus addresses, pull-ups, and shared buses.

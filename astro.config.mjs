@@ -162,7 +162,13 @@ export default defineConfig({
         },
         {
           label: 'Robotics',
-          items: [{ label: 'Overview', slug: 'robotics' }],
+          items: [
+            { label: 'Overview', slug: 'robotics' },
+            {
+              label: 'Obstacle-avoiding car',
+              slug: 'robotics/obstacle-avoidance-car',
+            },
+          ],
         },
         {
           label: 'Troubleshooting',

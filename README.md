@@ -93,7 +93,9 @@ src/content/docs/
 │     │  ├─ mqtt.mdx
 │     │  └─ can-bus.mdx
 │     └─ npu.mdx                          NPU and YOLOv5
-├─ robotics/index.md                      Scope and roadmap
+├─ robotics/
+│  ├─ index.md                            Scope and roadmap
+│  └─ obstacle-avoidance-car.mdx          Arduino obstacle-avoiding car
 ├─ troubleshooting/index.md               First-checks routine
 └─ contributing/index.mdx                 Contributor guide
 ```
@@ -172,6 +174,8 @@ public/images/
 │  ├─ applications/
 │  ├─ industrial/
 │  └─ npu/
+├─ robotics/
+│  └─ obstacle-avoidance-car/
 └─ ...
 ```
 
