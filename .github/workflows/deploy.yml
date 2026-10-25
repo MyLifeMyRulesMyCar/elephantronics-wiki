@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v7
+        with:
+          # Starlight reads commit dates for each page's "Last updated" line.
+          # A shallow clone would date every page to the deployment commit.
+          fetch-depth: 0
 
       - name: Install, build, and upload your site
         uses: withastro/action@v6

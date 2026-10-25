@@ -3,11 +3,19 @@
 A technical knowledge base for practical electronics, embedded Linux, robotics,
 and edge AI. Built with [Astro](https://astro.build/) and
 [Starlight](https://starlight.astro.build/), deployed as a static site to GitHub
-Pages at **https://wiki.elephantronics.lk**.
+Pages at **https://wiki.elephantronics.com**.
 
-> **Status:** initial foundation. No deployment has been performed from this
-> repository yet, and the tutorials are marked as drafts until they are
-> bench-tested.
+> **Status:** live. The site is deployed from this repository to
+> <https://wiki.elephantronics.com/>. Tutorials stay labelled **draft** or
+> **reviewed** according to how they have been verified.
+
+## Domains
+
+- **Wiki:** <https://wiki.elephantronics.com/> — the global technical knowledge
+  base in this repository.
+- **Shop:** <https://elephantronics.lk/> — the Sri Lankan shop for components and
+  boards. Tutorials link to the shop where relevant; those links are intentional
+  and are not part of the Wiki's canonical domain.
 
 ## Requirements
 
@@ -45,6 +53,7 @@ npm run build   # production build into dist/
   PULL_REQUEST_TEMPLATE.md
 public/
   CNAME                          Custom domain for GitHub Pages
+  robots.txt                     Crawl policy and sitemap location
   favicon.png                    Official mark, square favicon
   images/                        Article images, organised by page
 src/
@@ -213,7 +222,7 @@ directly from the **Edit page** link in the site footer.
 
 ## Deployment
 
-The site is configured for `https://wiki.elephantronics.lk` with no `base` path,
+The site is configured for `https://wiki.elephantronics.com` with no `base` path,
 and `public/CNAME` contains the custom domain. The GitHub Actions workflow
 deploys on pushes to `main` and supports manual dispatch.
 

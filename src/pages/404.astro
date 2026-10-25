@@ -8,6 +8,19 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
     description: 'The requested page does not exist in the Elephantronics Wiki.',
     template: 'splash',
     pagefind: false,
+    head: [
+      {
+        tag: 'meta',
+        attrs: { name: 'robots', content: 'noindex' },
+      },
+      {
+        tag: 'link',
+        attrs: {
+          rel: 'canonical',
+          href: 'https://wiki.elephantronics.com/404.html',
+        },
+      },
+    ],
     hero: {
       title: '404',
       tagline:

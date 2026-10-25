@@ -4,8 +4,7 @@ Thanks for helping improve the wiki. Contributions can be small — a typo fix, 
 corrected pin number, a better photo — or as large as a new tutorial.
 
 The **full beginner walkthrough** is on the wiki at
-<https://wiki.elephantronics.lk/contributing/> once the site is deployed. Its
-source lives at
+<https://wiki.elephantronics.com/contributing/>. Its source lives at
 [`src/content/docs/contributing/index.mdx`](src/content/docs/contributing/index.mdx).
 
 ## Quick start

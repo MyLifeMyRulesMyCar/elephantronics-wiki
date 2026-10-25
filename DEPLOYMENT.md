@@ -1,16 +1,30 @@
 # Deployment
 
 The site is a fully static Astro/Starlight build. GitHub Actions builds it and
-publishes the output to GitHub Pages, served at **https://wiki.elephantronics.lk**.
+publishes the output to GitHub Pages, served at **https://wiki.elephantronics.com/**.
+
+## Domains
+
+- **Shop:** <https://elephantronics.lk/> — the Sri Lankan store. It is not
+  deployed from this repository.
+- **Wiki:** <https://wiki.elephantronics.com/> — this site and the only canonical
+  host for Wiki pages.
+
+Tutorials may link to the shop when a part is available there. Those links are
+intentional cross-domain links; do not replace them with Wiki URLs or use the
+shop domain as a canonical host for Wiki pages.
 
 ## What is already configured
 
-- `astro.config.mjs` sets `site: 'https://wiki.elephantronics.lk'`.
+- `astro.config.mjs` sets `site: 'https://wiki.elephantronics.com'`.
 - There is **no `base`**, so every page and asset is served from the domain root.
-- `public/CNAME` contains exactly `wiki.elephantronics.lk`.
+- `public/CNAME` contains exactly `wiki.elephantronics.com`.
 - `.github/workflows/deploy.yml` deploys on pushes to `main` and supports manual
   dispatch. It requests only `contents: read`, `pages: write`, and
-  `id-token: write`.
+  `id-token: write`. The checkout uses `fetch-depth: 0` so Starlight can read the
+  full Git history for per-page "Last updated" dates.
+- `public/robots.txt` allows crawling and points to the sitemap index on the Wiki
+  domain.
 - `package-lock.json` is committed; the Astro action detects npm from it.
 
 No repository secrets are needed for a static site.
@@ -42,7 +56,7 @@ No repository secrets are needed for a static site.
 
 ## DNS
 
-At the DNS provider for `elephantronics.lk`, create:
+At the DNS provider for `elephantronics.com`, create:
 
 | Type | Name / host | Value | TTL |
 | --- | --- | --- | --- |
@@ -58,14 +72,14 @@ Notes:
   setting), set this record to **DNS only** while GitHub issues the certificate.
   A proxy can interfere with domain verification and TLS provisioning.
 - DNS propagation is usually quick but can take longer. Check with
-  `nslookup wiki.elephantronics.lk` before troubleshooting GitHub settings.
+  `nslookup wiki.elephantronics.com` before troubleshooting GitHub settings.
 
 ## Custom domain and HTTPS
 
 After DNS resolves:
 
 1. Go to **Settings → Pages → Custom domain**.
-2. Enter `wiki.elephantronics.lk` and save. This should match the committed
+2. Enter `wiki.elephantronics.com` and save. This should match the committed
    `public/CNAME` exactly.
 3. Wait for GitHub's DNS check to pass and for the certificate to be issued.
    This can take minutes to an hour.
@@ -74,14 +88,14 @@ After DNS resolves:
 > **Expect a short transition window.** Because `public/CNAME` is part of the
 > deployed artifact, GitHub Pages treats the site as a custom-domain site. Until
 > DNS resolves and the certificate is issued, the `github.io` address may
-> redirect to `wiki.elephantronics.lk` and fail to load. Configure DNS alongside
+> redirect to `wiki.elephantronics.com` and fail to load. Configure DNS alongside
 > the first deployment rather than weeks later.
 
 ## Verify the deployment
 
 - The **Actions** run finishes with both `build` and `deploy` green.
-- `https://wiki.elephantronics.lk/` returns the landing page over HTTPS.
-- `https://wiki.elephantronics.lk/microcontrollers/dht22-arduino-uno-oled/`
+- `https://wiki.elephantronics.com/` returns the landing page over HTTPS.
+- `https://wiki.elephantronics.com/microcontrollers/dht22-arduino-uno-oled/`
   returns the tutorial.
 - The certificate is valid for the custom domain and HTTP redirects to HTTPS.
 - The header logo and favicon load (the official mark is used).
@@ -91,8 +105,8 @@ After DNS resolves:
 Useful commands:
 
 ```bash
-curl -I https://wiki.elephantronics.lk/
-nslookup wiki.elephantronics.lk
+curl -I https://wiki.elephantronics.com/
+nslookup wiki.elephantronics.com
 ```
 
 ## Troubleshooting

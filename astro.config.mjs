@@ -6,7 +6,7 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
   // Custom domain deployment. Do not add `base`: all links are served from
   // the domain root. See DEPLOYMENT.md for the GitHub Pages and DNS steps.
-  site: 'https://wiki.elephantronics.lk',
+  site: 'https://wiki.elephantronics.com',
 
   integrations: [
     starlight({
