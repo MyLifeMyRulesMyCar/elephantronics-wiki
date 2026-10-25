@@ -56,9 +56,9 @@ output limit, on a robot that cannot drive off the bench.
 
 ### Obstacle-avoiding robot car
 
-A four-wheel Arduino Uno car with an L298N motor driver, an HC-SR04 ultrasonic
-sensor, and an SG90 servo. The guide covers chassis assembly, wiring tables, a
-motor test, the obstacle-avoidance program, and turn calibration.
+A verified four-wheel Arduino Uno car with an L298N motor driver, an HC-SR04
+ultrasonic sensor, and an SG90 servo. The guide covers chassis assembly, wiring
+tables, a motor test, the obstacle-avoidance program, and turn calibration.
 
 [Build the obstacle-avoiding robot car →](/robotics/obstacle-avoidance-car/)
 
@@ -71,8 +71,8 @@ motor test, the obstacle-avoidance program, and turn calibration.
 - Running ROS 2 on a single-board computer and talking to a microcontroller.
 - Power distribution and emergency-stop wiring for a small mobile robot.
 
-Robotics pages will be marked as drafts until the build has actually been run.
-Schematic-only examples will say so.
+Robotics pages are marked as drafts until the build has been run, and reviewed
+when the author has verified it on hardware. Schematic-only examples say so.
 
 ## Related sections
 

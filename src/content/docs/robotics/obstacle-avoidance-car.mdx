@@ -1,6 +1,6 @@
 ---
 title: Obstacle-avoiding robot car
-description: Build an Arduino Uno robot car with an L298N motor driver, HC-SR04 ultrasonic sensor, and SG90 servo. Includes assembly photos, wiring tables, testing, and turn calibration.
+description: Build a verified Arduino Uno robot car with an L298N motor driver, HC-SR04 ultrasonic sensor, and SG90 servo. Includes 17 build screenshots, wiring tables, testing, and turn calibration.
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -14,22 +14,22 @@ import WiringTable from '../../../components/WiringTable.astro';
 
 <TutorialHeader
   difficulty="Beginner"
-  status="draft"
+  status="reviewed"
   prerequisites={[
     'Arduino IDE installed on your computer',
     'Basic soldering and breadboard experience',
     'A charged 3 × 18650 battery pack and a compatible charger',
     'The chassis, motors, driver, sensor, servo, and fasteners listed below',
   ]}
-  note="The sketches are hosted externally on Google Drive and are not embedded in this wiki. The build steps and wiring have not been independently verified for this wiki."
+  note="Verified build: this page is based on the author's tested build document. The Arduino sketches are hosted externally on Google Drive and are not embedded in this wiki."
 />
 
 <Figure
   src="/images/robotics/obstacle-avoidance-car/wiring-complete.webp"
   alt="Completed obstacle-avoiding robot car with four wheels, Arduino Uno, L298N driver, battery holder, and front ultrasonic sensor"
-  caption="Completed obstacle-avoiding car. Image from Elephantronics' build tutorial."
-  width={1377}
-  height={768}
+  caption="Completed and verified obstacle-avoiding car from the author's build."
+  width={1379}
+  height={769}
   variant="cover"
   priority
 />
@@ -42,11 +42,11 @@ The build has four stages: chassis assembly, electronics placement, wiring, and
 testing with calibration. The wiring section is the most detailed part; check
 every connection before applying power.
 
-<Callout variant="warning" title="Draft build">
-  The instructions follow Elephantronics' published tutorial, but the robot has
-  not been built or measured for this wiki. The source code is only available as
-  two external Google Drive folders, and some source photos were not available.
-  Treat this page as a draft and verify the wiring against your own hardware.
+<Callout variant="tip" title="Verified build">
+  This guide is based on the author's tested build document and includes all 17
+  assembly, wiring, and test screenshots. The robot was built and tested by the
+  author; this wiki has not independently repeated the build. The Arduino
+  sketches remain external Google Drive downloads.
 </Callout>
 
 ## Safety before you start
@@ -89,24 +89,24 @@ trust and check the voltage/current ratings.
   src="/images/robotics/obstacle-avoidance-car/chassis-parts.webp"
   alt="Acrylic chassis plates, four yellow DC gear motors, wheels, battery holder, spacers, screws, and tools laid out"
   caption="Chassis plates, motors, wheels, fasteners, and battery holder before assembly."
-  width={1359}
-  height={768}
+  width={1378}
+  height={779}
 />
 
 <Figure
   src="/images/robotics/obstacle-avoidance-car/chassis-motors.webp"
   alt="Four DC gear motors and wheels fitted to the lower chassis plate"
   caption="Motors and wheels mounted on the lower chassis plate."
-  width={1372}
-  height={768}
+  width={1377}
+  height={771}
 />
 
 <Figure
   src="/images/robotics/obstacle-avoidance-car/chassis-assembled.webp"
   alt="Assembled acrylic chassis with upper plate, copper spacers, and wheels"
   caption="Upper chassis plate installed on the copper spacers."
-  width={1378}
-  height={768}
+  width={1380}
+  height={769}
 />
 
 ## Electronics placement
@@ -125,16 +125,16 @@ right. Place the remaining parts in this order:
   src="/images/robotics/obstacle-avoidance-car/servo-sensor-mount.webp"
   alt="SG90 servo and HC-SR04 ultrasonic sensor mounted on a bracket at the front of the chassis"
   caption="Servo and ultrasonic sensor at the front of the robot."
-  width={1354}
-  height={768}
+  width={1380}
+  height={783}
 />
 
 <Figure
   src="/images/robotics/obstacle-avoidance-car/electronics-layout.webp"
   alt="Arduino Uno, L298N motor driver, breadboard, switch, and battery holder placed on the robot chassis"
   caption="Suggested electronics layout. Keep the battery holder and motor wires clear of the wheels."
-  width={1374}
-  height={768}
+  width={1378}
+  height={770}
 />
 
 ## Wiring
@@ -154,10 +154,26 @@ right. Place the remaining parts in this order:
   in place during testing, swap the two motor wires on one side.
 </Callout>
 
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-motors-diagram.webp"
+  alt="Fritzing-style diagram of four DC motors connected in parallel to the L298N OUT1 to OUT4 terminals"
+  caption="Motor wiring diagram: the two motors on each side are wired in parallel to one L298N output channel."
+  width={1316}
+  height={745}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-motors-photo.webp"
+  alt="Motor wires connected to the L298N terminals on the assembled robot"
+  caption="Motor wires connected to the L298N on the verified build."
+  width={1316}
+  height={719}
+/>
+
 ### Power supply
 
 <WiringTable
-  caption="Example wiring — battery, switch, L298N, and Arduino power"
+  caption="Verified wiring — battery, switch, L298N, and Arduino power"
   fromLabel="From"
   toLabel="To"
   rows={[
@@ -166,25 +182,39 @@ right. Place the remaining parts in this order:
     { from: 'Battery holder black', to: 'L298N GND' },
     { from: 'L298N GND', to: 'Arduino GND' },
     { from: 'L298N GND', to: 'Breadboard GND rail' },
-    { from: 'L298N 5 V output', to: 'Arduino VIN', note: 'Verify this power path; see the caution below' },
+    { from: 'L298N 5 V output', to: 'Arduino VIN', note: 'Works on the verified build; check your board' },
     { from: 'L298N 5 V output', to: 'Breadboard 5 V rail' },
   ]}
   note="The common ground is mandatory. Without it the L298N may ignore the Arduino control signals."
 />
 
-<Callout variant="caution" title="Verify the Arduino power path">
-  The source connects the L298N 5 V output to the Arduino **VIN** pin. On a classic
-  Arduino Uno, VIN expects a higher input for the onboard regulator, so this
-  connection may not power the board reliably. Some builds feed the Uno through
-  the 5 V pin instead, but back-powering through USB or the 5 V pin has its own
-  risks. Check the regulator on your boards and measure the 5 V rail before
-  connecting the Arduino.
+<Callout variant="caution" title="Arduino power path">
+  This build feeds the Arduino **VIN** pin from the L298N 5 V output. It works on
+  the verified build, but VIN behaviour varies between Uno revisions and clones.
+  If you use different boards, measure the 5 V rail and check the regulator before
+  connecting the Arduino. Do not back-power the 5 V pin while USB is connected.
 </Callout>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-power-diagram.webp"
+  alt="Fritzing-style power wiring diagram showing the 18650 battery holder, switch, L298N, Arduino, and breadboard"
+  caption="Power wiring: battery through the switch to the L298N, with the 5 V rail and common ground."
+  width={1380}
+  height={767}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-power-photo.webp"
+  alt="Power and ground wires connected on the verified robot"
+  caption="Power and ground wiring on the verified robot."
+  width={1377}
+  height={763}
+/>
 
 ### HC-SR04 ultrasonic sensor
 
 <WiringTable
-  caption="Example wiring — HC-SR04 to Arduino and breadboard"
+  caption="Verified wiring — HC-SR04 to Arduino and breadboard"
   fromLabel="HC-SR04 pin"
   toLabel="Connection"
   rows={[
@@ -200,10 +230,18 @@ right. Place the remaining parts in this order:
   and clones have different input requirements.
 </Callout>
 
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-ultrasonic-diagram.webp"
+  alt="Fritzing-style diagram of the HC-SR04 ultrasonic sensor connected to Arduino D2 and D3 and the breadboard power rails"
+  caption="Ultrasonic sensor wiring: ECHO to D2, TRIG to D3, and VCC/GND to the breadboard rails."
+  width={1379}
+  height={767}
+/>
+
 ### SG90 servo
 
 <WiringTable
-  caption="Example wiring — SG90 servo"
+  caption="Verified wiring — SG90 servo"
   fromLabel="SG90 wire"
   toLabel="Connection"
   rows={[
@@ -214,10 +252,18 @@ right. Place the remaining parts in this order:
   note="Power the servo from the breadboard 5 V rail supplied by the L298N, not from the Arduino 5 V pin while the motors are running."
 />
 
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/wiring-servo-diagram.webp"
+  alt="Fritzing-style diagram of the SG90 servo connected to Arduino D5 with power and ground from the breadboard"
+  caption="Servo wiring: signal to D5, with power and ground from the breadboard rails."
+  width={1400}
+  height={780}
+/>
+
 ### L298N signal wiring
 
 <WiringTable
-  caption="Example wiring — L298N control signals to Arduino"
+  caption="Verified wiring — L298N control signals to Arduino"
   fromLabel="L298N pin"
   toLabel="Arduino pin"
   rows={[
@@ -238,9 +284,9 @@ right. Place the remaining parts in this order:
 <Figure
   src="/images/robotics/obstacle-avoidance-car/wiring-signal-diagram.webp"
   alt="Robot wiring diagram showing battery, switch, L298N, Arduino Uno, breadboard, four motors, HC-SR04, and SG90 servo connections"
-  caption="Example signal and power wiring. The tables above remain the source of truth for pin assignments."
-  width={1381}
-  height={651}
+  caption="Complete signal and power wiring from the verified build. The tables above remain the source of truth for pin assignments."
+  width={1377}
+  height={766}
 />
 
 ## Testing and calibration
@@ -268,6 +314,22 @@ wires on the affected side at the L298N terminals.
   the pin numbers match the wiring on your robot.
 </Callout>
 
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/test-motor-1.webp"
+  alt="Hand switching on the battery pack on the robot before the motor test"
+  caption="Switching on the battery pack for the motor test."
+  width={1400}
+  height={781}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/test-motor-2.webp"
+  alt="The robot car moving across the floor during the motor test"
+  caption="The car moving under the motor test sketch."
+  width={1263}
+  height={711}
+/>
+
 ### 2. Obstacle-avoidance code
 
 After the motor test passes, upload the main program:
@@ -280,12 +342,28 @@ In the main loop, the robot measures the distance ahead:
 - **Obstacle detected:** stop, reverse slightly, scan right and left with the
   servo, compare the two distances, and turn toward the side with more space.
 
-The 25 cm threshold and the scan angles are examples from the source. Tune them
+The 25 cm threshold and the scan angles come from the verified build. Tune them
 for your robot's size, speed, and surface.
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/test-avoid-1.webp"
+  alt="The robot car driving toward a blue sofa during the obstacle-avoidance test"
+  caption="Approaching an obstacle during the avoidance test."
+  width={1400}
+  height={778}
+/>
+
+<Figure
+  src="/images/robotics/obstacle-avoidance-car/test-avoid-2.webp"
+  alt="The robot car turning away from the sofa after detecting the obstacle"
+  caption="Turning away after the ultrasonic sensor detects the obstacle."
+  width={1304}
+  height={729}
+/>
 
 ### 3. Calibration
 
-During the source test, the robot turned almost 180° at every obstacle. The fix
+During the author's test, the robot turned almost 180° at every obstacle. The fix
 was to reduce the delay in `turnRight()` and `turnLeft()` from **900 ms to
 400 ms**. A shorter delay produces a shorter turn.
 
@@ -317,15 +395,14 @@ was to reduce the delay in `turnRight()` and `turnLeft()` from **900 ms to
 
 ## Source and verification
 
-Adapted from
+This page is based on the author's verified build document and the published
 [Obstacle Avoiding Robot Car — Step-by-Step Build Tutorial](https://elephantronics.lk/obstacle-avoidance-robot.html)
-on elephantronics.lk. The assembly steps, wiring tables, and calibration notes
-follow that article.
+on elephantronics.lk. The robot was assembled and tested by the author; the
+assembly steps, wiring, screenshots, and calibration values come from that build.
+All 17 build screenshots are included.
 
 The Arduino sketches are hosted in the two Google Drive folders linked above;
-they are not embedded in this repository. Ten of the source article's images
-(wiring diagrams 06–11 and test photos 14–17) were not available in the copied
-assets, so they are omitted; the wiring tables cover those connections.
+they are not embedded in this repository.
 
-The robot has not been assembled or measured for this wiki. Treat the page as a
-draft until the build and code have been verified on hardware.
+The wiki has not independently repeated the build. Re-check the wiring against
+your own hardware before applying power.

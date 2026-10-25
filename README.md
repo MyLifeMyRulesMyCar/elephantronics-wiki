@@ -95,7 +95,7 @@ src/content/docs/
 │     └─ npu.mdx                          NPU and YOLOv5
 ├─ robotics/
 │  ├─ index.md                            Scope and roadmap
-│  └─ obstacle-avoidance-car.mdx          Arduino obstacle-avoiding car
+│  └─ obstacle-avoidance-car.mdx          Verified Arduino obstacle-avoiding car
 ├─ troubleshooting/index.md               First-checks routine
 └─ contributing/index.mdx                 Contributor guide
 ```
